@@ -15,7 +15,7 @@ export function NotificationBell() {
   // Activa el polling de notificaciones
   useNotifications()
 
-  const { notifications, toasts, markRead, markAllRead, removeToast, unreadCount } = useNotifStore()
+  const { notifications, markRead, markAllRead, removeToast, unreadCount } = useNotifStore()
   const [open, setOpen]   = useState(false)
   const ref               = useRef<HTMLDivElement>(null)
   const navigate          = useNavigate()

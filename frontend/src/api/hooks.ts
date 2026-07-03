@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from './client'
 import type {
-  Predio, Propietario, Lead, Conversacion,
+  Predio, Propietario, Lead, Conversacion, Mensaje,
   Proyecto, AnalisisViabilidad, PaginatedResponse,
 } from '../types/models'
 
@@ -122,7 +122,7 @@ export function useConversaciones(filters?: { estado?: string; search?: string }
 export function useConversacion(id: number) {
   return useQuery({
     queryKey: ['conversacion', id],
-    queryFn: () => get<Conversacion & { mensajes: object[] }>(`/conversaciones/${id}/`),
+    queryFn: () => get<Conversacion & { mensajes: Mensaje[] }>(`/conversaciones/${id}/`),
     enabled: !!id,
     refetchInterval: 5_000,
   })

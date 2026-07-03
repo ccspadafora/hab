@@ -5,6 +5,16 @@ import { apiClient } from '../../api/client'
 import { useQueryClient } from '@tanstack/react-query'
 import styles from './EstructuracionPage.module.css'
 
+type Estructuracion = Record<string, string | number | boolean | null> & {
+  id: number
+  version?: number | string | null
+  generada_por_ia?: boolean | null
+  creada_en?: string | null
+  resumen_ejecutivo?: string | null
+  fortalezas?: string[] | null
+  riesgos?: string[] | null
+}
+
 const COP = (n: number | string | null | undefined) => {
   if (!n && n !== 0) return '—'
   return `$ ${Number(n).toLocaleString('es-CO')}`
@@ -22,8 +32,8 @@ export default function EstructuracionPage() {
   const [msg,     setMsg]     = useState('')
   const [form,    setForm]    = useState<Record<string, string>>({})
 
-  const ext = p as typeof p & { estructuraciones?: Array<Record<string, unknown>> }
-  const est = ext?.estructuraciones?.[0] as Record<string, number | string | null | boolean> | undefined
+  const ext = p as typeof p & { estructuraciones?: Estructuracion[] }
+  const est = ext?.estructuraciones?.[0]
 
   useEffect(() => {
     if (est) {
@@ -80,9 +90,8 @@ export default function EstructuracionPage() {
   const totalC    = costoDir + totalCI
   const utilidad  = ventas - totalC
 
-  const editVal = (k: string) => editing
-    ? <input className={styles.editInput} value={form[k] ?? ''} onChange={e => set(k, e.target.value)} type="number" />
-    : COP(est?.[k])
+  const asStringList = (value: Estructuracion[keyof Estructuracion]) =>
+    Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 
   return (
     <div>
@@ -265,16 +274,16 @@ export default function EstructuracionPage() {
             <div className="card" style={{ marginTop: 16 }}>
               <div className="section-label" style={{ marginBottom: 12 }}><span className="line" />🤖 Narrativa IA</div>
               <p className="body-text">{String(est.resumen_ejecutivo)}</p>
-              {(est.fortalezas as string[])?.length > 0 && (
+              {asStringList(est.fortalezas).length > 0 && (
                 <div style={{ marginTop: 14 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--verde)', marginBottom: 6, textTransform: 'uppercase' }}>Fortalezas</p>
-                  {(est.fortalezas as string[]).map((f, i) => <p key={i} className="body-sm" style={{ marginBottom: 4 }}>→ {f}</p>)}
+                  {asStringList(est.fortalezas).map((f, i) => <p key={i} className="body-sm" style={{ marginBottom: 4 }}>→ {f}</p>)}
                 </div>
               )}
-              {(est.riesgos as string[])?.length > 0 && (
+              {asStringList(est.riesgos).length > 0 && (
                 <div style={{ marginTop: 12 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--negativo)', marginBottom: 6, textTransform: 'uppercase' }}>Riesgos</p>
-                  {(est.riesgos as string[]).map((r, i) => <p key={i} className="body-sm" style={{ marginBottom: 4 }}>→ {r}</p>)}
+                  {asStringList(est.riesgos).map((r, i) => <p key={i} className="body-sm" style={{ marginBottom: 4 }}>→ {r}</p>)}
                 </div>
               )}
             </div>

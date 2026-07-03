@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { apiClient } from '../../api/client'
 import type { Conversacion } from '../../types/models'
@@ -55,10 +55,6 @@ export function useNotifications() {
   const { addNotification } = useNotifStore()
 
   // Guarda el último mensaje visto por conversación en sessionStorage
-  const getLastSeen = useCallback((convId: number): string => {
-    return sessionStorage.getItem(`notif_seen_${convId}`) ?? ''
-  }, [])
-
   const setLastSeen = useCallback((convId: number, timestamp: string) => {
     sessionStorage.setItem(`notif_seen_${convId}`, timestamp)
   }, [])

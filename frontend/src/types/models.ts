@@ -45,6 +45,7 @@ export interface Predio {
   tags:                  string[]
   tags_manuales:         string[]
   metricas_prefact:      MetricasPrefact
+  detalle_scores?:       Record<string, number>
   imagenes:              string[]
   primera_deteccion:     string
   ultima_actualizacion:  string
@@ -61,11 +62,17 @@ export interface Propietario {
   tipo:               'persona_natural' | 'persona_juridica'
   cedula_nit:         string
   telefono_principal: string
+  telefono_secundario?: string | null
   email:              string
   whatsapp_phone:     string
   asesor_asignado:    number | null
   estado_contacto:    EstadoContacto
   temperatura:        'frio' | 'tibio' | 'caliente'
+  ciudad?:            string | null
+  direccion_residencia?: string | null
+  fuente_origen?:     string | null
+  primer_contacto?:   string | null
+  ultimo_contacto?:   string | null
   etiquetas:          string[]
   created_at:         string
 }
@@ -76,9 +83,17 @@ export interface AnalisisViabilidad {
   predio:               number
   zona_pot:             string
   indice_construccion:  number | null
+  indice_ocupacion?:    number | null
+  altura_max_pisos?:    number | null
+  uso_suelo?:           string | null
+  densidad_max_uds?:    number | null
   area_edificable:      number | null
   unidades_proyectadas: number | null
+  precio_m2_nuevo?:     number | null
   valor_bruto_proyecto: number | null
+  costo_construccion?:  number | null
+  valor_max_predio?:    number | null
+  utilidad_estimada?:   number | null
   margen_estimado:      number | null
   es_viable:            boolean | null
   score_viabilidad:     number | null
@@ -98,11 +113,17 @@ export interface Lead {
   nombre:      string
   telefono:    string
   email:       string
+  cedula?:     string | null
   predio:      number | null
   propietario: number | null
   asesor:      number | null
   estado:      EstadoLead
   temperatura: 'frio' | 'tibio' | 'caliente'
+  fuente_origen?: string | null
+  ultimo_contacto?: string | null
+  proxima_accion?: string | null
+  nota_proxima_accion?: string | null
+  notas?:       string | null
   created_at:  string
   updated_at:  string
 }
@@ -120,6 +141,7 @@ export interface Conversacion {
   iniciado_en:      string
   ultimo_mensaje:   string | null
   ultimo_mensaje_texto?: string
+  mensajes?:        Mensaje[]
 }
 
 export interface Mensaje {

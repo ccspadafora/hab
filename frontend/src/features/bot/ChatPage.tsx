@@ -2,18 +2,13 @@ import { useState, useRef, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useConversaciones, useConversacion, useTomarControl, useCederControl } from '../../api/hooks'
 import { apiClient } from '../../api/client'
-import type { Conversacion } from '../../types/models'
+import type { Conversacion, Mensaje } from '../../types/models'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import styles from './ChatPage.module.css'
 
 const timeAgo = (d: string | null) =>
   d ? formatDistanceToNow(new Date(d), { addSuffix: true, locale: es }) : '—'
-
-type MsgType = {
-  id: number; direccion: string; contenido: string
-  enviado_en: string; generado_por_ia: boolean; tipo: string
-}
 
 export default function ChatPage() {
   const [searchParams]  = useSearchParams()
@@ -42,7 +37,7 @@ export default function ChatPage() {
   }, [conv])
 
   const convs = lista?.results ?? []
-  const msgs  = (conv as (typeof conv & { mensajes?: MsgType[] }) | undefined)?.mensajes ?? []
+  const msgs: Mensaje[] = conv?.mensajes ?? []
 
   const enviarMensaje = async () => {
     if (!texto.trim() || !selected) return
