@@ -46,10 +46,11 @@ COPY . .
 EXPOSE 8000
 
 FROM base AS production
+ARG INSTALL_PLAYWRIGHT_CHROMIUM=false
 COPY requirements/production.txt requirements/production.txt
 RUN pip install --no-cache-dir -r requirements/production.txt
 ENV PLAYWRIGHT_BROWSERS_PATH=/app/.cache/ms-playwright
-RUN playwright install chromium
+RUN if [ "$INSTALL_PLAYWRIGHT_CHROMIUM" = "true" ]; then playwright install chromium; fi
 COPY . .
 RUN adduser --disabled-password --gecos '' nonroot \
     && chown -R nonroot:nonroot /app
