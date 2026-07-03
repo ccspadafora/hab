@@ -2,8 +2,8 @@ import { useParams, Link } from 'react-router-dom'
 import { useAnalisis } from '../../api/hooks'
 import styles from './ViabilidadDetailPage.module.css'
 
-const f  = (n: number | null) => n != null ? `$${(n / 1_000_000).toFixed(1)}M` : '—'
-const fp = (n: number | null) => n != null ? `${Number(n).toFixed(1)}%` : '—'
+const f  = (n: number | null | undefined) => n != null ? `$${(n / 1_000_000).toFixed(1)}M` : '—'
+const fp = (n: number | null | undefined) => n != null ? `${Number(n).toFixed(1)}%` : '—'
 
 export default function ViabilidadDetailPage() {
   const { id } = useParams<{ id: string }>()

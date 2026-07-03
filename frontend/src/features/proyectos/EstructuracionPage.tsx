@@ -15,7 +15,7 @@ type Estructuracion = Record<string, string | number | boolean | null> & {
   riesgos?: string[] | null
 }
 
-const COP = (n: number | string | null | undefined) => {
+const COP = (n: number | string | boolean | null | undefined) => {
   if (!n && n !== 0) return '—'
   return `$ ${Number(n).toLocaleString('es-CO')}`
 }
@@ -90,7 +90,7 @@ export default function EstructuracionPage() {
   const totalC    = costoDir + totalCI
   const utilidad  = ventas - totalC
 
-  const asStringList = (value: Estructuracion[keyof Estructuracion]) =>
+  const asStringList = (value: Estructuracion[keyof Estructuracion] | string[] | undefined) =>
     Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 
   return (
