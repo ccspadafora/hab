@@ -1,0 +1,17 @@
+.msg { font-size: 12px; padding: 8px 12px; border-radius: var(--radius-sm); margin-bottom: 14px;
+  background: rgba(224,112,112,0.08); border: 1px solid rgba(224,112,112,0.2); color: var(--negativo); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.full { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.fl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--texto); }
+.sectionTitle { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--verde); margin: 4px 0 12px; padding-top: 14px; border-top: 1px solid rgba(43,77,46,0.1); }
+.autoLeadInfo {
+  background: rgba(43,77,46,0.07); border: 1px solid rgba(43,77,46,0.2);
+  border-radius: var(--radius-sm); padding: 12px 14px;
+  font-size: 13px; font-weight: 300; color: var(--texto);
+  margin-bottom: 16px; line-height: 1.5;
+}
+.actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px;
+  padding-top: 16px; border-top: 1px solid rgba(43,77,46,0.1); }
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }

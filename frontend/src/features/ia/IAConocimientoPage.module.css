@@ -1,0 +1,47 @@
+.header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+.headerRight { display: flex; align-items: center; gap: 10px; }
+.filtro { width: 160px; font-size: 12px; }
+.msg { font-size: 12.5px; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 16px;
+  background: rgba(126,200,126,0.1); border: 1px solid rgba(126,200,126,0.3); color: #2a6e2a; }
+.loading { padding: 40px; text-align: center; color: #999; }
+
+/* Formulario */
+.formCard {
+  background: var(--blanco);
+  border: 1px solid rgba(43,77,46,0.15);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 24px;
+  border-top: 3px solid var(--verde);
+}
+.formTitle { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--verde); margin-bottom: 18px; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.fullWidth { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.fl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--texto); }
+.textarea { width: 100%; padding: 10px 12px; border: 1px solid rgba(43,77,46,0.2); border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 13px; font-weight: 300; resize: vertical; outline: none; line-height: 1.6;
+  transition: border-color .2s; }
+.textarea:focus { border-color: var(--verde); }
+.fileInput { font-size: 12px; cursor: pointer; }
+.fileName { font-size: 11px; color: var(--verde); margin-top: 3px; }
+.formActions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Grid de docs */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.docCard { display: flex; flex-direction: column; gap: 10px; }
+.inactive { opacity: 0.5; }
+.docTop { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.docIcon { font-size: 20px; }
+.docMeta { display: flex; gap: 6px; flex: 1; }
+.docNombre { font-size: 14px; font-weight: 700; color: var(--texto); line-height: 1.3; }
+.preview { font-family: var(--font-body); font-size: 11.5px; font-weight: 300; color: #777; line-height: 1.5;
+  background: var(--crema); border-radius: var(--radius-sm); padding: 10px 12px; white-space: pre-wrap; overflow: hidden; }
+.fecha { font-size: 10px; color: #bbb; margin-top: auto; }
+.empty { grid-column: 1 / -1; padding: 48px; text-align: center; background: var(--blanco);
+  border-radius: var(--radius-md); border: 1px dashed rgba(43,77,46,0.15); color: #aaa; }
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .formGrid { grid-template-columns: 1fr; }
+}

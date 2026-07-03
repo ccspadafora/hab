@@ -1,0 +1,45 @@
+# Copia este bloque dentro del http {} de nginx.prod.conf
+# después de obtener certificados con Certbot.
+# Reemplaza app.tudominio.com por tu dominio real.
+
+server {
+    listen 443 ssl http2;
+    server_name app.tudominio.com;
+
+    ssl_certificate     /etc/letsencrypt/live/app.tudominio.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/app.tudominio.com/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    location /api/ {
+        proxy_pass         http://django;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto https;
+        proxy_read_timeout 60s;
+    }
+
+    location /admin/ {
+        proxy_pass         http://django;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto https;
+    }
+
+    location /flower/ {
+        proxy_pass         http://flower:5555/flower/;
+        proxy_http_version 1.1;
+        proxy_set_header   Host $host;
+    }
+
+    location / {
+        root       /usr/share/nginx/html;
+        try_files  $uri $uri/ /index.html;
+    }
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+}

@@ -1,0 +1,27 @@
+.header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
+.kpiGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+
+.section { margin-bottom: 28px; }
+.tableWrap { background: var(--gris); border-radius: var(--radius-md); padding: 0; overflow: hidden; }
+.table { width: 100%; border-collapse: collapse; color: rgba(255,255,255,0.65); }
+.table thead tr { background: rgba(255,255,255,0.06); }
+.table th { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--amarillo); padding: 12px 16px; text-align: left; }
+.table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; }
+.table tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+.faseSection { margin-bottom: 28px; }
+.faseGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+.faseItem {
+  background: var(--verde);
+  border-radius: var(--radius-sm);
+  padding: 14px 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  text-align: center;
+}
+.faseN { font-family: var(--font-display); font-weight: 900; font-size: 28px; color: var(--amarillo); line-height: 1; }
+.faseL { font-size: 9.5px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+
+@media (max-width: 900px) {
+  .kpiGrid { grid-template-columns: repeat(2, 1fr); }
+  .faseGrid { grid-template-columns: repeat(3, 1fr); }
+}

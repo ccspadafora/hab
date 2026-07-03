@@ -1,0 +1,71 @@
+.loading { padding: 60px; text-align: center; color: #999; }
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #888; margin-bottom: 20px; }
+.breadcrumb a { color: var(--verde); text-decoration: none; font-weight: 600; }
+.header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.metaRow { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.metaFecha { font-size: 11px; color: #aaa; }
+.noEst { padding: 40px; text-align: center; color: #aaa; background: var(--blanco); border-radius: var(--radius-md); }
+
+/* Ingresos editor */
+.ingresoCard { background: var(--blanco); border: 1px solid rgba(43,77,46,0.15); border-radius: var(--radius-md); padding: 18px 22px; margin-bottom: 16px; }
+.ingresoGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.fl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--texto); }
+
+/* ── Tabla P&G ── */
+.tableWrap { border-radius: var(--radius-md); overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.pgTable { width: 100%; border-collapse: collapse; background: var(--blanco); }
+.pgTable thead tr { background: var(--verde); }
+.thItem { padding: 14px 18px; font-size: 14px; font-weight: 700; color: var(--blanco); text-align: left; width: 50%; }
+.thTotal { padding: 14px 12px; font-size: 14px; font-weight: 700; color: var(--blanco); text-align: center; }
+.thPct { padding: 14px 18px; font-size: 12px; font-weight: 700; color: var(--blanco); text-align: right; width: 120px; }
+
+.pgTable td { padding: 10px 18px; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+.tdSym { width: 20px; padding: 10px 4px; color: #888; font-size: 13px; }
+.tdVal { text-align: right; font-variant-numeric: tabular-nums; padding-right: 18px; }
+
+/* Filas especiales */
+.rowTitle { font-weight: 700; background: #f8f8f8; }
+.rowTitle td { color: var(--texto); font-size: 14px; }
+
+.rowTotalVerde { background: #2B4D2E; }
+.rowTotalVerde td { color: var(--blanco); font-weight: 700; font-size: 14px; }
+
+.rowAmarillo { background: #C9B84C; }
+.rowAmarillo td { color: var(--gris); font-weight: 700; font-style: italic; font-size: 13.5px; }
+
+.rowSubheader td { font-weight: 700; font-size: 13px; color: var(--texto); padding: 12px 18px 6px; background: #f5f5f5; }
+
+.rowNormal td { color: #333; }
+.rowNormal td:last-child { color: #666; font-size: 12px; text-align: right; }
+.rowNormal:hover td { background: rgba(43,77,46,0.03); }
+
+.rowTotalNegro { background: #333; }
+.rowTotalNegro td { color: var(--blanco); font-weight: 700; font-size: 14px; }
+
+.rowUtilidad { }
+.utilPos { background: #2B4D2E; }
+.utilPos td { color: var(--blanco); font-weight: 700; font-size: 14px; }
+.utilNeg { background: #C0392B; }
+.utilNeg td { color: var(--blanco); font-weight: 700; font-size: 14px; }
+
+/* Input dentro de tabla */
+.editInput {
+  background: rgba(255,255,255,0.9); border: 1px solid rgba(201,184,76,0.6);
+  border-radius: 4px; padding: 4px 8px; font-size: 12px; width: 100%; max-width: 160px;
+  outline: none; text-align: right; font-variant-numeric: tabular-nums;
+}
+
+/* HAB fees */
+.habCard { background: var(--verde); border-radius: var(--radius-md); padding: 22px 26px; margin-bottom: 16px; }
+.pGTitle { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.4); margin-bottom: 16px; }
+.habGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.habItem { display: flex; flex-direction: column; gap: 4px; }
+.habVal { font-family: var(--font-display); font-weight: 900; font-size: 20px; }
+.habLabel { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+
+@media (max-width: 900px) {
+  .habGrid { grid-template-columns: repeat(2, 1fr); }
+  .ingresoGrid { grid-template-columns: 1fr 1fr; }
+}

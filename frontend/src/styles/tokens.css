@@ -1,0 +1,47 @@
+:root {
+  /* ── Colores de marca ── */
+  --verde:       #2B4D2E;
+  --verde-m:     #3D6B40;
+  --verde-c:     #8FA882;
+  --amarillo:    #C9B84C;
+  --crema:       #F5F2EC;
+  --gris:        #1A1A1A;
+  --blanco:      #FFFFFF;
+  --texto:       #2C2C2C;
+  --logo:        #8A9A7A;
+
+  /* ── Semánticos ── */
+  --positivo:    #7EC87E;
+  --negativo:    #E07070;
+
+  /* ── Opacidades estándar (como variables) ── */
+  --op-body:       rgba(255,255,255,0.65);
+  --op-sec:        rgba(255,255,255,0.48);
+  --op-ter:        rgba(255,255,255,0.35);
+  --op-border:     rgba(255,255,255,0.08);
+  --op-card:       rgba(255,255,255,0.05);
+  --amarillo-bg:   rgba(201,184,76,0.14);
+  --amarillo-bd:   rgba(201,184,76,0.28);
+  --verde-bg:      rgba(43,77,46,0.09);
+  --verde-bd:      rgba(43,77,46,0.18);
+
+  /* ── Tipografía ── */
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body:    'Barlow', sans-serif;
+
+  /* ── Espaciado ── */
+  --pad-v:  clamp(56px, 7vw, 112px);
+  --pad-h:  clamp(20px, 5vw, 80px);
+
+  /* ── Border radius ── */
+  --radius-lg:   20px;
+  --radius-md:   16px;
+  --radius-sm:   12px;
+  --radius-pill: 100px;
+
+  /* ── Transición base ── */
+  --transition: background .3s, border-color .3s, transform .3s, box-shadow .3s;
+
+  /* ── Sidebar ── */
+  --sidebar-w: 220px;
+}

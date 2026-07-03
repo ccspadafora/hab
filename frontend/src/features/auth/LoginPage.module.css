@@ -1,0 +1,176 @@
+.page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+/* ── Panel izquierdo — marca ── */
+.brand {
+  background: var(--verde);
+  padding: var(--pad-v) var(--pad-h);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.brandInner { position: relative; z-index: 1; }
+
+.brandLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--amarillo);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.brandLine {
+  display: block;
+  width: 30px;
+  height: 2px;
+  background: var(--amarillo);
+  flex-shrink: 0;
+}
+
+.brandTitle {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(52px, 7vw, 88px);
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: var(--blanco);
+  margin-bottom: 20px;
+}
+.brandAccent { color: var(--amarillo); }
+
+.brandSub {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.8;
+  margin-bottom: 40px;
+}
+
+.stats {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.stat { display: flex; flex-direction: column; gap: 3px; }
+.statN {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 30px;
+  color: var(--amarillo);
+  line-height: 1;
+}
+.statL {
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.38);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.watermark {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(100px, 18vw, 220px);
+  color: rgba(255,255,255,0.03);
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -4px;
+}
+
+/* ── Panel derecho — formulario ── */
+.form {
+  background: var(--crema);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.formCard {
+  width: 100%;
+  max-width: 380px;
+  background: var(--blanco);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  box-shadow: 0 8px 40px rgba(43,77,46,0.08);
+}
+
+.formHeader { margin-bottom: 28px; }
+.formLogoMark {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--verde);
+  letter-spacing: 3px;
+  display: block;
+  margin-bottom: 14px;
+}
+.formTitle {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  text-transform: uppercase;
+  color: var(--gris);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.formSub {
+  font-size: 13px;
+  font-weight: 300;
+  color: #888;
+  line-height: 1.5;
+}
+
+.formBody { display: flex; flex-direction: column; gap: 18px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--texto);
+}
+.inputError { border-color: var(--negativo) !important; }
+.fieldErr { font-size: 11px; color: var(--negativo); }
+
+.error {
+  font-size: 12px;
+  color: var(--negativo);
+  background: rgba(224,112,112,0.08);
+  border: 1px solid rgba(224,112,112,0.2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 12px;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.formFooter {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 300;
+  color: rgba(0,0,0,0.28);
+  letter-spacing: 1px;
+}
+
+@media (max-width: 900px) {
+  .page { grid-template-columns: 1fr; }
+  .brand { display: none; }
+}

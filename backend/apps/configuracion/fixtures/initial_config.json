@@ -1,0 +1,88 @@
+[
+  {
+    "model": "configuracion.configuracionsistema",
+    "pk": 1,
+    "fields": {
+      "clave": "scraping.delay_entre_peticiones",
+      "valor": 3,
+      "tipo": "integer",
+      "descripcion": "Segundos entre peticiones al scraper",
+      "categoria": "scraping",
+      "editable_frontend": true,
+      "actualizado_por": null,
+      "actualizado_en": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "configuracion.configuracionsistema",
+    "pk": 2,
+    "fields": {
+      "clave": "ia.bot.activa_global",
+      "valor": true,
+      "tipo": "boolean",
+      "descripcion": "Activa o desactiva el bot de IA globalmente",
+      "categoria": "ia",
+      "editable_frontend": true,
+      "actualizado_por": null,
+      "actualizado_en": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "configuracion.configuracionsistema",
+    "pk": 3,
+    "fields": {
+      "clave": "scraping.area_lote_min",
+      "valor": 80,
+      "tipo": "integer",
+      "descripcion": "Área mínima de lote en m² para considerar un predio",
+      "categoria": "scraping",
+      "editable_frontend": true,
+      "actualizado_por": null,
+      "actualizado_en": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "configuracion.configuracionsistema",
+    "pk": 4,
+    "fields": {
+      "clave": "ia.escalamiento_mensajes",
+      "valor": 15,
+      "tipo": "integer",
+      "descripcion": "Número de mensajes tras los cuales se escala la conversación a un asesor",
+      "categoria": "ia",
+      "editable_frontend": true,
+      "actualizado_por": null,
+      "actualizado_en": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "configuracion.configuracionsistema",
+    "pk": 5,
+    "fields": {
+      "clave": "general.ciudad_objetivo",
+      "valor": "Bogotá",
+      "tipo": "string",
+      "descripcion": "Ciudad principal de operación de HAB",
+      "categoria": "general",
+      "editable_frontend": false,
+      "actualizado_por": null,
+      "actualizado_en": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "configuracion.configuracionia",
+    "pk": 1,
+    "fields": {
+      "modelo_estructuracion": "gpt-4o",
+      "modelo_bot_whatsapp": "gpt-4o",
+      "modelo_scoring": "gpt-4o-mini",
+      "temperatura_bot": "0.70",
+      "temperatura_estructuracion": "0.30",
+      "max_tokens_respuesta_bot": 500,
+      "max_tokens_estructuracion": 4000,
+      "ia_bot_activa_global": true,
+      "escalar_tras_n_mensajes": 15,
+      "actualizado_en": "2026-01-01T00:00:00Z"
+    }
+  }
+]

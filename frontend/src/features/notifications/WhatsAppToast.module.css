@@ -1,0 +1,99 @@
+.container {
+  position: fixed;
+  right: 20px;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  position: fixed;
+  right: 20px;
+  width: 320px;
+  background: var(--blanco);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(43,77,46,0.12);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 14px 14px 14px;
+  cursor: pointer;
+  pointer-events: all;
+  animation: slideIn .35s cubic-bezier(.34,1.56,.64,1) forwards;
+  border-left: 4px solid #25D366; /* verde WhatsApp */
+  transition: transform .2s, box-shadow .2s;
+}
+.toast:hover {
+  transform: translateX(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22), 0 0 0 1px rgba(43,77,46,0.2);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(120%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.toastIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.toastBody { flex: 1; min-width: 0; }
+
+.toastHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.toastContact {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--texto);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.toastTime {
+  font-size: 10px;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.toastMsg {
+  font-size: 12.5px;
+  font-weight: 300;
+  color: #555;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+.toastCta {
+  font-size: 10px;
+  font-weight: 600;
+  color: #25D366;
+  letter-spacing: 0.3px;
+}
+
+.toastClose {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color .15s;
+}
+.toastClose:hover { color: var(--negativo); }

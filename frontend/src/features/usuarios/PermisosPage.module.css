@@ -1,0 +1,64 @@
+.header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+.loading { padding: 40px; text-align: center; color: #999; }
+
+.layout { display: grid; grid-template-columns: 240px 1fr; gap: 16px; }
+
+/* Lista de roles */
+.roleList { background: var(--blanco); border-radius: var(--radius-md); border: 1px solid rgba(43,77,46,0.1); overflow: hidden; }
+.roleBtn { width: 100%; display: flex; align-items: center; gap: 10px; padding: 13px 16px;
+  background: none; border: none; border-left: 3px solid transparent;
+  cursor: pointer; text-align: left; transition: background .15s, border-color .15s; }
+.roleBtn:hover { background: rgba(43,77,46,0.04); }
+.roleBtnActive { background: rgba(43,77,46,0.08); }
+.roleDot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.roleLabel { flex: 1; font-size: 13px; font-weight: 600; color: var(--texto); }
+.fullAccessTag { font-size: 9px; color: var(--amarillo); background: var(--verde);
+  padding: 2px 6px; border-radius: 100px; font-weight: 700; letter-spacing: 1px; }
+
+/* Matriz */
+.matrix { background: var(--blanco); border-radius: var(--radius-md); border: 1px solid rgba(43,77,46,0.1); overflow: hidden; }
+.matrixHeader { display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; background: var(--crema); border-bottom: 1px solid rgba(43,77,46,0.1); flex-wrap: wrap; gap: 10px; }
+.matrixTitle { font-size: 14px; font-weight: 700; color: var(--texto); }
+
+.fullAccessMsg { display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px; gap: 12px; color: #aaa; text-align: center; }
+
+.permTable { width: 100%; border-collapse: collapse; }
+.thMod { padding: 10px 20px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--verde); background: var(--crema); text-align: left; }
+.thPerm { padding: 10px 20px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--verde); background: var(--crema); text-align: center; width: 100px; }
+.thAccess { padding: 10px 20px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--verde); background: var(--crema); text-align: left; width: 140px; }
+
+.permRow { border-bottom: 1px solid rgba(43,77,46,0.06); transition: background .1s; }
+.permRow:hover { background: rgba(43,77,46,0.02); }
+.noAccess { opacity: 0.55; }
+
+.tdMod { padding: 12px 20px; font-size: 13px; font-weight: 400; color: var(--texto); }
+.tdCheck { padding: 12px 20px; text-align: center; }
+
+/* Toggle switch */
+.toggle { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; inset: 0; border-radius: 22px;
+  background: #ddd; transition: .2s;
+}
+.slider::before {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; left: 3px; bottom: 3px;
+  background: var(--blanco); border-radius: 50%; transition: .2s;
+}
+.toggle input:checked + .slider { background: var(--verde); }
+.toggle input:checked + .slider::before { transform: translateX(18px); }
+.sliderDisabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Nivel badges */
+.nivelBadge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px; }
+.nivel_total { background: rgba(126,200,126,0.15); color: #2a6e2a; border: 1px solid rgba(126,200,126,0.3); }
+.nivel_solo_lectura { background: rgba(201,184,76,0.12); color: #7a6e20; border: 1px solid rgba(201,184,76,0.3); }
+.nivel_sin_acceso { background: rgba(0,0,0,0.05); color: #aaa; border: 1px solid #ddd; }
+
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }

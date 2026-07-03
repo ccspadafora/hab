@@ -1,0 +1,35 @@
+.topBar { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+.msg { font-size: 12.5px; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 14px;
+  background: rgba(126,200,126,0.1); border: 1px solid rgba(126,200,126,0.3); color: #2a6e2a; }
+.formCard { background: var(--blanco); border: 1px solid rgba(43,77,46,0.15); border-radius: var(--radius-md);
+  padding: 22px; margin-bottom: 20px; border-top: 3px solid var(--verde); }
+.formTitle { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--verde); margin-bottom: 16px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.full { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.fl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--texto); }
+.ta { width: 100%; padding: 10px 12px; border: 1px solid rgba(43,77,46,0.2); border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 13px; resize: vertical; outline: none; }
+.ta:focus { border-color: var(--verde); }
+.actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+.agenteGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.agenteCard { display: flex; flex-direction: column; gap: 10px; }
+.inactive { opacity: 0.5; }
+.aTop { display: flex; align-items: center; gap: 10px; }
+.aIconWrap { font-size: 22px; width: 40px; height: 40px; background: var(--verde); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.aInfo { flex: 1; }
+.aNombre { font-size: 13.5px; font-weight: 700; color: var(--texto); }
+.aModulo { font-size: 10px; color: #aaa; text-transform: capitalize; margin-top: 2px; }
+.aMeta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.instrPrev { font-family: var(--font-body); font-size: 11px; color: #777; background: var(--crema);
+  border-radius: var(--radius-sm); padding: 8px; white-space: pre-wrap; }
+.aActions { display: flex; gap: 8px; margin-top: 4px; }
+.empty { grid-column: 1 / -1; padding: 40px; text-align: center; background: var(--blanco);
+  border-radius: var(--radius-md); border: 1px dashed rgba(43,77,46,0.15); color: #aaa; }
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .agenteGrid { grid-template-columns: 1fr 1fr; }
+}

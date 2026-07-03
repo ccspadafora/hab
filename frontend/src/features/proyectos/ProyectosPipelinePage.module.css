@@ -1,0 +1,47 @@
+.header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 12px; }
+.viewToggle { display: flex; border: 1px solid rgba(43,77,46,0.2); border-radius: var(--radius-sm); overflow: hidden; }
+.vBtn { background: none; border: none; padding: 7px 14px; font-size: 11px; font-weight: 600;
+  color: #888; cursor: pointer; transition: background .15s; }
+.vBtn:hover { background: rgba(43,77,46,0.05); }
+.vActive { background: var(--verde); color: var(--blanco); }
+.filters { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.search { flex: 1; min-width: 200px; }
+.sel { width: 180px; }
+.total { font-size: 11px; font-weight: 600; color: rgba(43,77,46,0.6); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; margin-left: auto; }
+.hint { font-size: 11px; color: #aaa; margin-bottom: 14px; }
+.loading { padding: 40px; text-align: center; color: #999; }
+.board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 16px; min-height: 70vh; align-items: flex-start; }
+.col { min-width: 220px; width: 220px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; border-radius: var(--radius-sm); transition: outline .15s; }
+.colOver { outline: 2px solid var(--amarillo); outline-offset: 2px; }
+.colHead { background: var(--blanco); border-radius: var(--radius-sm); border: 1px solid rgba(43,77,46,0.1);
+  border-top: 3px solid transparent; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+.colLabel { font-size: 11.5px; font-weight: 700; color: var(--texto); }
+.colCount { font-size: 10px; color: #aaa; margin-top: 1px; }
+.cards { display: flex; flex-direction: column; gap: 8px; min-height: 80px; padding: 3px 2px; }
+.cardsOver { background: rgba(201,184,76,0.06); border-radius: var(--radius-sm); }
+.card { display: flex; flex-direction: column; gap: 7px; background: var(--blanco);
+  border: 1px solid rgba(43,77,46,0.1); border-radius: var(--radius-sm); padding: 13px;
+  cursor: grab; user-select: none; touch-action: none; transition: box-shadow .15s, border-color .15s; }
+.card:hover { border-color: var(--verde-c); box-shadow: 0 4px 14px rgba(43,77,46,0.1); }
+.card:active { cursor: grabbing; }
+.dragging { box-shadow: 0 16px 40px rgba(43,77,46,0.25) !important; border-color: var(--amarillo) !important; transform: rotate(1.5deg) scale(1.03); z-index: 9999; }
+.codigo { display: inline-block; font-size: 9.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--amarillo); background: var(--verde); padding: 2px 8px; border-radius: 100px; align-self: flex-start; }
+.nombre { font-size: 12.5px; font-weight: 700; color: var(--texto); line-height: 1.3; }
+.cardFoot { display: flex; justify-content: space-between; align-items: center; }
+.gerente { font-size: 10.5px; color: #888; }
+.valor { font-family: var(--font-display); font-weight: 900; font-size: 14px; color: var(--verde); }
+.verLink { font-size: 10px; font-weight: 600; color: var(--verde-c); text-decoration: none; }
+.verLink:hover { color: var(--verde); }
+.emptyCol { padding: 24px 10px; text-align: center; font-size: 11px; color: #ccc;
+  border: 1.5px dashed rgba(43,77,46,0.18); border-radius: var(--radius-sm); min-height: 60px;
+  display: flex; align-items: center; justify-content: center; }
+/* Tabla */
+.tableWrap { background: var(--blanco); border-radius: var(--radius-md); overflow: hidden; border: 1px solid rgba(43,77,46,0.1); }
+.table { width: 100%; border-collapse: collapse; }
+.table thead tr { background: var(--verde); }
+.table th { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--amarillo); padding: 11px 14px; text-align: left; }
+.table tbody tr { border-bottom: 1px solid rgba(43,77,46,0.06); transition: background .12s; }
+.table tbody tr:hover { background: rgba(43,77,46,0.03); }
+.table td { padding: 10px 14px; vertical-align: middle; font-size: 13px; }
+.faseSel { font-size: 11px; padding: 4px 8px; border: 1px solid rgba(43,77,46,0.2); border-radius: var(--radius-sm); background: var(--blanco); cursor: pointer; }
