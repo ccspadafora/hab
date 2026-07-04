@@ -40,6 +40,8 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.production
       POSTGRES_HOST: db
+    volumes:
+      - backend_static:/app/staticfiles
     depends_on:
       db:
         condition: service_healthy
@@ -122,6 +124,7 @@ services:
     volumes:
       - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
       - frontend_dist:/usr/share/nginx/html:ro
+      - backend_static:/usr/share/nginx/django-static:ro
       - certbot_www:/var/www/certbot:ro
       - certbot_certs:/etc/letsencrypt:ro
     depends_on:
@@ -134,5 +137,6 @@ volumes:
   postgres_data:
   redis_data:
   frontend_dist:
+  backend_static:
   certbot_www:
   certbot_certs:
