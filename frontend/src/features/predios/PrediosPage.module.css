@@ -8,7 +8,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -59,7 +59,7 @@
 .filters {
   display: flex;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   flex-wrap: wrap;
   align-items: center;
   width: 100%;
@@ -70,7 +70,7 @@
 .sel { width: 180px; }
 
 .hint {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   color: #7f8679;
   font-size: 11px;
   letter-spacing: .6px;
@@ -88,7 +88,7 @@
 
 .board {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   width: max-content;
   min-width: 100%;
   min-height: 72vh;
@@ -96,14 +96,13 @@
 }
 
 .column {
-  min-width: 316px;
-  width: 316px;
+  min-width: 300px;
+  width: 300px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  height: calc(100vh - 250px);
-  min-height: 520px;
+  gap: 8px;
+  height: clamp(620px, calc(100vh - 180px), 840px);
 }
 
 .colOver { transform: translateY(-2px); }
@@ -113,7 +112,7 @@
   border: 1px solid rgba(43,77,46,0.1);
   border-top: 4px solid transparent;
   border-radius: 18px;
-  padding: 14px 16px 12px;
+  padding: 12px 14px 10px;
   box-shadow: 0 8px 18px rgba(232, 227, 217, 0.9);
   flex-shrink: 0;
 }
@@ -132,7 +131,7 @@
 
 .colLabel {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
   color: var(--texto);
 }
@@ -145,15 +144,15 @@
 }
 
 .colHint {
-  margin-top: 5px;
+  margin-top: 4px;
   color: #919487;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .cards {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   min-height: 0;
   flex: 1;
   overflow-y: auto;
@@ -188,7 +187,7 @@
 .card {
   background: #1f1f1f;
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 18px;
+  border-radius: 16px;
   color: #f4f0e7;
   cursor: grab;
   flex-shrink: 0;
@@ -211,78 +210,86 @@
 }
 
 .cardMedia {
-  height: 164px;
+  height: 116px;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
 .cardMediaFallback {
-  height: 102px;
+  height: 74px;
   background:
     radial-gradient(circle at 20% 20%, rgba(214,194,79,0.2), transparent 32%),
     linear-gradient(135deg, rgba(61,107,64,0.88), rgba(31,31,31,0.98));
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding: 14px 16px;
 }
 
 .cardMediaFallback span {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 900;
-  letter-spacing: 1px;
+  border: 1px solid rgba(214,194,79,0.45);
+  border-radius: 999px;
+  color: #f2e4a6;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .9px;
+  padding: 6px 12px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.84);
 }
 
 .cardBody {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 14px 16px;
+  gap: 8px;
+  padding: 12px 12px 14px;
 }
 
 .cardCode {
   color: rgba(242,228,166,0.82);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: .7px;
   text-transform: uppercase;
 }
 
 .cardTitle {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .cardPrice {
   color: #f2e4a6;
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 900;
 }
 
 .metaGrid {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
   color: rgba(244,240,231,0.82);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .tagRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .softTag,
 .softTagAlt {
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  padding: 4px 8px;
+  padding: 4px 7px;
 }
 
 .softTag {
@@ -310,7 +317,7 @@
 
 .scoreLabel {
   color: rgba(244,240,231,0.62);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: .8px;
   text-transform: uppercase;
@@ -318,7 +325,7 @@
 
 .verLink {
   color: #f4f0e7;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .8px;
   text-decoration: none;
