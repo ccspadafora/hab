@@ -248,7 +248,7 @@ export default function ScrapingConfigPage() {
                       onChange={e => setConfig(c => ({ ...c!, umbral_score_auto_viable: Number(e.target.value) }))} />
                   </div>
                   <div className={styles.field}>
-                    <label className={styles.fl}>Umbral score → No viable</label>
+                    <label className={styles.fl}>Umbral score → Archivo</label>
                     <input className="input" type="number" min="0" max="100"
                       value={config.umbral_score_auto_noviable ?? 30}
                       onChange={e => setConfig(c => ({ ...c!, umbral_score_auto_noviable: Number(e.target.value) }))} />

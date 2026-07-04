@@ -41,7 +41,7 @@ class AnalisisViabilidad(models.Model):
         if self.es_viable is True:
             estado = 'viable'
         elif self.es_viable is False:
-            estado = 'no viable'
+            estado = 'descartado'
         else:
             estado = 'pendiente'
         return f'Análisis {self.predio} — {estado}'

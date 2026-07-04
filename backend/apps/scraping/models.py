@@ -9,12 +9,13 @@ TIPO_PREDIO_CHOICES = [
 ]
 
 ESTADO_PREDIO_CHOICES = [
-    ('nuevo',       'Nuevo'),
-    ('en_analisis', 'En análisis'),
-    ('viable',      'Viable'),
-    ('no_viable',   'No viable'),
-    ('contactado',  'Contactado'),
-    ('descartado',  'Descartado'),
+    ('para_estudio',         'Para estudio'),
+    ('contacto_inicial',     'Contacto inicial'),
+    ('prefactibilidad',      'Prefactibilidad'),
+    ('viable_negociacion',   'Viable - pasar a negociación'),
+    ('cierres_potenciales',  'Cierres potenciales'),
+    ('estruct_propietarios', 'Estructuración propietarios'),
+    ('descartado',           'Descartado'),
 ]
 
 
@@ -80,7 +81,7 @@ class Predio(models.Model):
     precio_m2        = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
 
     # Estado en el pipeline
-    estado = models.CharField(max_length=20, choices=ESTADO_PREDIO_CHOICES, default='nuevo', db_index=True)
+    estado = models.CharField(max_length=32, choices=ESTADO_PREDIO_CHOICES, default='para_estudio', db_index=True)
 
     # Metadata
     imagenes        = models.JSONField(default=list)

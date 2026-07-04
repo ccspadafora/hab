@@ -18,12 +18,13 @@ export function ScoreBadge({ score }: { score: number | null }) {
 
 // ── Estado del predio ─────────────────────────────────────
 const PREDIO_ESTADO: Record<EstadoPredio, { label: string; bg: string; color: string }> = {
-  nuevo:       { label: 'Nuevo',       bg: 'rgba(43,77,46,0.09)',    color: '#2B4D2E' },
-  en_analisis: { label: 'En análisis', bg: 'rgba(201,184,76,0.14)',  color: '#9A8A30' },
-  viable:      { label: 'Viable',      bg: 'rgba(126,200,126,0.18)', color: '#3A7A3A' },
-  no_viable:   { label: 'No viable',   bg: 'rgba(224,112,112,0.14)', color: '#B54040' },
-  contactado:  { label: 'Contactado',  bg: 'rgba(100,149,237,0.14)', color: '#3060A0' },
-  descartado:  { label: 'Descartado',  bg: 'rgba(150,150,150,0.12)', color: '#888' },
+  para_estudio:         { label: 'Para estudio',                    bg: 'rgba(123,141,101,0.14)', color: '#556544' },
+  contacto_inicial:     { label: 'Contacto inicial',                bg: 'rgba(63,131,213,0.14)', color: '#2F67A0' },
+  prefactibilidad:      { label: 'Prefactibilidad',                 bg: 'rgba(185,137,82,0.14)', color: '#8B6035' },
+  viable_negociacion:   { label: 'Viable - negociación',            bg: 'rgba(47,122,82,0.16)',  color: '#2F7A52' },
+  cierres_potenciales:  { label: 'Cierres potenciales',             bg: 'rgba(184,108,58,0.14)', color: '#9C5B2E' },
+  estruct_propietarios: { label: 'Estructuración propietarios',     bg: 'rgba(126,82,160,0.14)', color: '#744A98' },
+  descartado:           { label: 'Descartado',                      bg: 'rgba(150,150,150,0.12)', color: '#888' },
 }
 
 export function EstadoBadge({ estado }: { estado: EstadoPredio }) {

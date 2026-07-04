@@ -41,10 +41,10 @@ def task_calcular_prefactibilidad(self, predio_id: int):
 def _determinar_estado_auto(score: float) -> str:
     """Determina estado automático según el score. Umbrales configurables vía ConfiguracionScraping."""
     if score >= 70:
-        return 'viable'
+        return 'viable_negociacion'
     if score <= 25:
-        return 'no_viable'
-    return 'nuevo'
+        return 'descartado'
+    return 'para_estudio'
 
 
 @shared_task(bind=True, queue='scraping', max_retries=3)

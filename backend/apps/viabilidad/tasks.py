@@ -74,7 +74,7 @@ def task_calcular_score_ia(self, analisis_id: int):
         analisis.save(update_fields=['score_viabilidad', 'justificacion_ia'])
 
         if analisis.score_viabilidad and analisis.score_viabilidad >= 70:
-            analisis.predio.estado = 'viable'
+            analisis.predio.estado = 'viable_negociacion'
             analisis.predio.save(update_fields=['estado'])
 
         logger.info(

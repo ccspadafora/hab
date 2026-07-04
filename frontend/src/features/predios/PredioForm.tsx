@@ -5,7 +5,15 @@ import type { Predio } from '../../types/models'
 import styles from './PredioForm.module.css'
 
 const TIPOS   = ['casa','lote','apartamento','local']
-const ESTADOS = ['nuevo','en_analisis','viable','no_viable','contactado','descartado']
+const ESTADOS = [
+  { value: 'para_estudio',         label: 'Para estudio' },
+  { value: 'contacto_inicial',     label: 'Contacto inicial' },
+  { value: 'prefactibilidad',      label: 'Prefactibilidad' },
+  { value: 'viable_negociacion',   label: 'Viable - pasar a negociación' },
+  { value: 'cierres_potenciales',  label: 'Cierres potenciales' },
+  { value: 'estruct_propietarios', label: 'Estructuración propietarios' },
+  { value: 'descartado',           label: 'Descartado' },
+]
 
 interface Props { predio?: Predio | null; onClose: () => void; onSaved?: (p: Predio) => void }
 
@@ -24,7 +32,7 @@ export default function PredioForm({ predio, onClose, onSaved }: Props) {
     barrio: '', localidad: '', ciudad: 'Bogotá', direccion: '',
     tipo: 'casa', area_lote: '', area_construida: '',
     estrato: '', pisos: '', anio_construccion: '',
-    precio_publicado: '', precio_m2: '', estado: 'nuevo',
+    precio_publicado: '', precio_m2: '', estado: 'para_estudio',
     descripcion_raw: '',
   })
   const [saving, setSaving] = useState(false)
@@ -48,7 +56,7 @@ export default function PredioForm({ predio, onClose, onSaved }: Props) {
         anio_construccion:String((predio as any).anio_construccion ?? ''),
         precio_publicado: String(predio.precio_publicado ?? ''),
         precio_m2:        String(predio.precio_m2 ?? ''),
-        estado:           String(predio.estado ?? 'nuevo'),
+        estado:           String(predio.estado ?? 'para_estudio'),
         descripcion_raw:  String((predio as any).descripcion_raw ?? ''),
       })
     }
@@ -116,7 +124,9 @@ export default function PredioForm({ predio, onClose, onSaved }: Props) {
         <div className={styles.field}>
           <label className={styles.fl}>Estado</label>
           <select name="estado" className="input" value={form.estado} onChange={handleChange}>
-            {ESTADOS.map(e => <option key={e} value={e}>{e.replace(/_/g,' ')}</option>)}
+            {ESTADOS.map((estado) => (
+              <option key={estado.value} value={estado.value}>{estado.label}</option>
+            ))}
           </select>
         </div>
       </div>

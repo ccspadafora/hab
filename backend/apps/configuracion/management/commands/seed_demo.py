@@ -145,63 +145,63 @@ class Command(BaseCommand):
         predios_data = [
             dict(barrio='Chapinero Alto', localidad='Chapinero', tipo='casa',
                  area_lote=320, area_construida=280, estrato=5, pisos=2, anio_construccion=1978,
-                 precio_publicado=1_850_000_000, estado='viable',
+                 precio_publicado=1_850_000_000, estado='viable_negociacion',
                  score_prefactibilidad=Decimal('82.5'),
                  tags=['alta_prioridad','lote_grande','inmueble_antiguo','precio_favorable','zona_densificacion','estrato_objetivo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[0]),
 
             dict(barrio='Usaquén', localidad='Usaquén', tipo='lote',
                  area_lote=480, area_construida=0, estrato=6, pisos=0, anio_construccion=None,
-                 precio_publicado=3_200_000_000, estado='en_analisis',
+                 precio_publicado=3_200_000_000, estado='prefactibilidad',
                  score_prefactibilidad=Decimal('76.3'),
                  tags=['alta_prioridad','lote_grande','consolidacion_posible','zona_densificacion','estrato_objetivo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[1]),
 
             dict(barrio='Rosales', localidad='Chapinero', tipo='casa',
                  area_lote=250, area_construida=320, estrato=6, pisos=3, anio_construccion=1985,
-                 precio_publicado=2_400_000_000, estado='viable',
+                 precio_publicado=2_400_000_000, estado='viable_negociacion',
                  score_prefactibilidad=Decimal('79.1'),
                  tags=['alta_prioridad','lote_grande','inmueble_antiguo','zona_densificacion','estrato_objetivo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[2]),
 
             dict(barrio='Cedritos', localidad='Usaquén', tipo='casa',
                  area_lote=195, area_construida=180, estrato=4, pisos=2, anio_construccion=1992,
-                 precio_publicado=980_000_000, estado='nuevo',
+                 precio_publicado=980_000_000, estado='para_estudio',
                  score_prefactibilidad=Decimal('61.4'),
                  tags=['media_prioridad','precio_favorable','estrato_objetivo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[3]),
 
             dict(barrio='Chicó', localidad='Usaquén', tipo='casa',
                  area_lote=420, area_construida=380, estrato=6, pisos=3, anio_construccion=1972,
-                 precio_publicado=4_500_000_000, estado='en_analisis',
+                 precio_publicado=4_500_000_000, estado='prefactibilidad',
                  score_prefactibilidad=Decimal('71.8'),
                  tags=['alta_prioridad','lote_grande','consolidacion_posible','inmueble_antiguo','estrato_objetivo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[4]),
 
             dict(barrio='Niza', localidad='Suba', tipo='casa',
                  area_lote=280, area_construida=240, estrato=4, pisos=2, anio_construccion=1988,
-                 precio_publicado=1_200_000_000, estado='contactado',
+                 precio_publicado=1_200_000_000, estado='contacto_inicial',
                  score_prefactibilidad=Decimal('58.7'),
                  tags=['media_prioridad','lote_grande','inmueble_antiguo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[5]),
 
             dict(barrio='Santa Bárbara', localidad='Usaquén', tipo='lote',
                  area_lote=350, area_construida=0, estrato=5, pisos=0, anio_construccion=None,
-                 precio_publicado=2_800_000_000, estado='nuevo',
+                 precio_publicado=2_800_000_000, estado='para_estudio',
                  score_prefactibilidad=Decimal('68.2'),
                  tags=['media_prioridad','lote_grande','zona_densificacion','estrato_objetivo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[6]),
 
             dict(barrio='Quinta Camacho', localidad='Chapinero', tipo='casa',
                  area_lote=160, area_construida=200, estrato=5, pisos=2, anio_construccion=1995,
-                 precio_publicado=1_650_000_000, estado='nuevo',
+                 precio_publicado=1_650_000_000, estado='para_estudio',
                  score_prefactibilidad=Decimal('44.3'),
                  tags=['baja_prioridad'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[7]),
 
             dict(barrio='Pardo Rubio', localidad='Chapinero', tipo='casa',
                  area_lote=210, area_construida=190, estrato=4, pisos=2, anio_construccion=1980,
-                 precio_publicado=890_000_000, estado='viable',
+                 precio_publicado=890_000_000, estado='viable_negociacion',
                  score_prefactibilidad=Decimal('73.6'),
                  tags=['alta_prioridad','lote_grande','inmueble_antiguo','precio_favorable'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[8]),
@@ -215,14 +215,14 @@ class Command(BaseCommand):
 
             dict(barrio='La Carolina', localidad='Usaquén', tipo='lote',
                  area_lote=520, area_construida=0, estrato=6, pisos=0, anio_construccion=None,
-                 precio_publicado=5_800_000_000, estado='en_analisis',
+                 precio_publicado=5_800_000_000, estado='prefactibilidad',
                  score_prefactibilidad=Decimal('85.0'),
                  tags=['alta_prioridad','lote_grande','consolidacion_posible','zona_densificacion','estrato_objetivo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[1]),
 
             dict(barrio='San Patricio', localidad='Usaquén', tipo='casa',
                  area_lote=290, area_construida=260, estrato=5, pisos=3, anio_construccion=1975,
-                 precio_publicado=2_100_000_000, estado='nuevo',
+                 precio_publicado=2_100_000_000, estado='para_estudio',
                  score_prefactibilidad=Decimal('64.9'),
                  tags=['media_prioridad','lote_grande','inmueble_antiguo','estrato_objetivo'],
                  descripcion_raw=DESCRIPCIONES_PREDIO[2]),
@@ -451,7 +451,7 @@ class Command(BaseCommand):
         self.stdout.write('🏗️  Creando proyecto demo...')
         gerente = User.objects.filter(role='gerente').first() or User.objects.first()
 
-        predios_viables = Predio.objects.filter(estado='viable')
+        predios_viables = Predio.objects.filter(estado='viable_negociacion')
         if not predios_viables.exists():
             self.stdout.write('  ⚠️  Sin predios viables, saltando proyecto')
             return

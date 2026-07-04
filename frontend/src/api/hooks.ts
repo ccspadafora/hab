@@ -47,6 +47,18 @@ export function usePredioPipeline() {
   })
 }
 
+export function useUpdatePredioEstado() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, estado }: { id: number; estado: string }) =>
+      patch(`/predios/${id}/`, { estado }),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ['predios'] })
+      qc.invalidateQueries({ queryKey: ['predio', vars.id] })
+    },
+  })
+}
+
 export function useRecalcularPrefact() {
   const qc = useQueryClient()
   return useMutation({
@@ -289,8 +301,8 @@ export function useDashboardStats() {
         get<PaginatedResponse<Proyecto>>('/proyectos/', { page_size: 1 }),
         get<PaginatedResponse<Conversacion>>('/conversaciones/', { estado: 'activa', page_size: 1 }),
       ])
-      const viables = await get<PaginatedResponse<Predio>>('/predios/', { estado: 'viable', page_size: 1 })
-      const nuevos  = await get<PaginatedResponse<Predio>>('/predios/', { estado: 'nuevo', page_size: 1 })
+      const viables = await get<PaginatedResponse<Predio>>('/predios/', { estado: 'viable_negociacion', page_size: 1 })
+      const nuevos  = await get<PaginatedResponse<Predio>>('/predios/', { estado: 'para_estudio', page_size: 1 })
       return {
         predios_total:      predios.count,
         predios_viables:    viables.count,

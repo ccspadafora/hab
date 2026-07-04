@@ -14,7 +14,14 @@ export interface User {
 }
 
 // ── Scraping ──────────────────────────────────────────────
-export type EstadoPredio = 'nuevo' | 'en_analisis' | 'viable' | 'no_viable' | 'contactado' | 'descartado'
+export type EstadoPredio =
+  | 'para_estudio'
+  | 'contacto_inicial'
+  | 'prefactibilidad'
+  | 'viable_negociacion'
+  | 'cierres_potenciales'
+  | 'estruct_propietarios'
+  | 'descartado'
 
 export interface MetricasPrefact {
   area_edificable_est:  number
@@ -30,6 +37,7 @@ export interface Predio {
   id:                    number
   fuente:                number
   url_origen:            string
+  codigo_externo?:       string
   barrio:                string
   localidad:             string
   ciudad:                string

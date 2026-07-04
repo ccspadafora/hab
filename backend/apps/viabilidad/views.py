@@ -33,7 +33,7 @@ class AnalisisViabilidadViewSet(viewsets.ModelViewSet):
         analisis.es_viable = True
         analisis.notas = request.data.get('notas', analisis.notas)
         analisis.save(update_fields=['es_viable', 'notas'])
-        analisis.predio.estado = 'viable'
+        analisis.predio.estado = 'viable_negociacion'
         analisis.predio.save(update_fields=['estado'])
         return Response(AnalisisViabilidadSerializer(analisis).data)
 
@@ -43,6 +43,6 @@ class AnalisisViabilidadViewSet(viewsets.ModelViewSet):
         analisis.es_viable = False
         analisis.razon_no_viabilidad = request.data.get('razon', '')
         analisis.save(update_fields=['es_viable', 'razon_no_viabilidad'])
-        analisis.predio.estado = 'no_viable'
+        analisis.predio.estado = 'descartado'
         analisis.predio.save(update_fields=['estado'])
         return Response(AnalisisViabilidadSerializer(analisis).data)

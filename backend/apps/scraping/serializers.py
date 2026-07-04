@@ -19,9 +19,10 @@ class PredioListSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Predio
         fields = [
-            'id', 'barrio', 'localidad', 'ciudad', 'direccion',
+            'id', 'fuente', 'url_origen', 'codigo_externo',
+            'barrio', 'localidad', 'ciudad', 'direccion',
             'tipo', 'area_lote', 'estrato', 'precio_publicado', 'precio_m2',
-            'estado', 'score_prefactibilidad', 'tags',
+            'estado', 'score_prefactibilidad', 'tags', 'tags_manuales', 'imagenes',
             'primera_deteccion', 'ultima_actualizacion',
         ]
 
