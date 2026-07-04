@@ -69,11 +69,19 @@
   text-transform: uppercase;
 }
 
+.boardViewport {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 14px;
+}
+
 .board {
   display: flex;
   gap: 14px;
-  overflow-x: auto;
-  padding-bottom: 14px;
+  width: max-content;
+  min-width: 100%;
   min-height: 72vh;
   align-items: flex-start;
 }

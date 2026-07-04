@@ -359,17 +359,19 @@ export default function PrediosPage() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className={styles.board}>
-            {COLUMNAS.map((col) => (
-              <PredioColumn
-                key={col.key}
-                colKey={col.key}
-                label={col.label}
-                accent={col.accent}
-                hint={col.hint}
-                predios={filteredPipelinePredios.filter((predio) => predio.estado === col.key)}
-              />
-            ))}
+          <div className={styles.boardViewport}>
+            <div className={styles.board}>
+              {COLUMNAS.map((col) => (
+                <PredioColumn
+                  key={col.key}
+                  colKey={col.key}
+                  label={col.label}
+                  accent={col.accent}
+                  hint={col.hint}
+                  predios={filteredPipelinePredios.filter((predio) => predio.estado === col.key)}
+                />
+              ))}
+            </div>
           </div>
           <DragOverlay dropAnimation={null}>
             {activePredio ? <PredioCard predio={activePredio} isDragging /> : null}
