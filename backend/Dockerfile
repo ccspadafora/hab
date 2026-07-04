@@ -56,5 +56,4 @@ RUN adduser --disabled-password --gecos '' nonroot \
     && chown -R nonroot:nonroot /app
 COPY docker-entrypoint.prod.sh /docker-entrypoint.prod.sh
 RUN chmod +x /docker-entrypoint.prod.sh
-USER nonroot
 EXPOSE 8000
