@@ -15,6 +15,11 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     permission_classes = [IsAuthenticated, IsAdmin]
 
+    def get_permissions(self):
+        if self.action == 'me':
+            return [IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
     def get_serializer_class(self):
         if self.action == 'create':
             return UserCreateSerializer
