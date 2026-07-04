@@ -112,6 +112,10 @@
   border-top: 4px solid transparent;
   border-radius: 18px;
   padding: 14px 16px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  box-shadow: 0 8px 18px rgba(232, 227, 217, 0.9);
 }
 
 .colTop {
