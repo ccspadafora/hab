@@ -53,10 +53,13 @@ def task_ejecutar_scraping_fuente(self, fuente_id: int):
     Ejecuta el scraping de una fuente específica.
     Programado por Celery Beat según la frecuencia configurada.
     """
+    from apps.configuracion.models import ConfiguracionScraping
     from apps.scraping.models import FuenteScraping, EjecucionScraping
+    from apps.scraping.services.registry import get_scraper_for_fuente
 
     try:
         fuente = FuenteScraping.objects.get(pk=fuente_id, activo=True)
+        config = ConfiguracionScraping.objects.filter(fuente=fuente).first()
         ejecucion = EjecucionScraping.objects.create(
             fuente=fuente,
             inicio=timezone.now(),
@@ -64,18 +67,36 @@ def task_ejecutar_scraping_fuente(self, fuente_id: int):
         )
         logger.info('scraping.inicio', extra={'fuente': fuente.nombre})
 
-        # TODO: Implementar scraper específico por fuente
-        # scraper = get_scraper(fuente)
-        # predios_encontrados, predios_nuevos = scraper.ejecutar()
+        scraper = get_scraper_for_fuente(fuente, config=config)
+        result = scraper.ejecutar()
 
-        ejecucion.fin    = timezone.now()
+        ejecucion.fin = timezone.now()
         ejecucion.estado = 'exitoso'
-        ejecucion.save()
+        ejecucion.predios_encontrados = result.predios_encontrados
+        ejecucion.predios_nuevos = result.predios_nuevos
+        ejecucion.errores = result.errores
+        ejecucion.log = result.log_text
+        ejecucion.save(update_fields=[
+            'fin',
+            'estado',
+            'predios_encontrados',
+            'predios_nuevos',
+            'errores',
+            'log',
+        ])
 
         fuente.ultima_ejecucion = timezone.now()
         fuente.save(update_fields=['ultima_ejecucion'])
 
-        logger.info('scraping.done', extra={'fuente': fuente.nombre})
+        logger.info(
+            'scraping.done',
+            extra={
+                'fuente': fuente.nombre,
+                'predios_encontrados': result.predios_encontrados,
+                'predios_nuevos': result.predios_nuevos,
+                'errores': result.errores,
+            },
+        )
 
     except Exception as exc:
         logger.exception('scraping.error', extra={'fuente_id': fuente_id})
