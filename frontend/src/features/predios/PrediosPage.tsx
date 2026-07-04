@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   DndContext, DragOverlay, PointerSensor,
@@ -114,27 +114,34 @@ function PredioCard({ predio, isDragging = false }: { predio: Predio; isDragging
   )
 }
 
-function PredioColumn({ colKey, label, accent, hint, predios }: {
-  colKey: EstadoPredio
+function PipelineColumnHeader({ label, accent, hint, count }: {
   label: string
   accent: string
   hint: string
+  count: number
+}) {
+  return (
+    <header className={styles.colHeader} style={{ borderTopColor: accent }}>
+      <div>
+        <div className={styles.colTop}>
+          <span className={styles.colDot} style={{ background: accent }} />
+          <span className={styles.colLabel}>{label}</span>
+          <span className={styles.colCount}>{count}</span>
+        </div>
+        <p className={styles.colHint}>{hint}</p>
+      </div>
+    </header>
+  )
+}
+
+function PredioColumn({ colKey, predios }: {
+  colKey: EstadoPredio
   predios: Predio[]
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `col-${colKey}` })
 
   return (
     <section className={`${styles.column} ${isOver ? styles.colOver : ''}`}>
-      <header className={styles.colHeader} style={{ borderTopColor: accent }}>
-        <div>
-          <div className={styles.colTop}>
-            <span className={styles.colDot} style={{ background: accent }} />
-            <span className={styles.colLabel}>{label}</span>
-            <span className={styles.colCount}>{predios.length}</span>
-          </div>
-          <p className={styles.colHint}>{hint}</p>
-        </div>
-      </header>
       <SortableContext
         id={colKey}
         items={predios.map((predio) => `predio-${predio.id}`)}
@@ -157,6 +164,8 @@ export default function PrediosPage() {
   const [showForm,  setShowForm]  = useState(false)
   const [view,      setView]      = useState<'pipeline' | 'tabla'>('pipeline')
   const [activeId,  setActiveId]  = useState<string | null>(null)
+  const headerScrollRef = useRef<HTMLDivElement | null>(null)
+  const bodyScrollRef = useRef<HTMLDivElement | null>(null)
 
   const filters: PrediosFilter = {
     estado:   estado   || undefined,
@@ -211,6 +220,11 @@ export default function PrediosPage() {
     const current = filteredPipelinePredios.find((predio) => predio.id === predioId)?.estado
     if (!target || target === current) return
     updateEstado.mutate({ id: predioId, estado: target })
+  }
+
+  const syncHeaderScroll = () => {
+    if (!headerScrollRef.current || !bodyScrollRef.current) return
+    headerScrollRef.current.scrollLeft = bodyScrollRef.current.scrollLeft
   }
 
   return (
@@ -359,18 +373,31 @@ export default function PrediosPage() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className={styles.boardViewport}>
-            <div className={styles.board}>
-              {COLUMNAS.map((col) => (
-                <PredioColumn
-                  key={col.key}
-                  colKey={col.key}
-                  label={col.label}
-                  accent={col.accent}
-                  hint={col.hint}
-                  predios={filteredPipelinePredios.filter((predio) => predio.estado === col.key)}
-                />
-              ))}
+          <div className={styles.pipelineShell}>
+            <div ref={headerScrollRef} className={styles.boardHeaderViewport}>
+              <div className={styles.board}>
+                {COLUMNAS.map((col) => (
+                  <div key={col.key} className={styles.column}>
+                    <PipelineColumnHeader
+                      label={col.label}
+                      accent={col.accent}
+                      hint={col.hint}
+                      count={filteredPipelinePredios.filter((predio) => predio.estado === col.key).length}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div ref={bodyScrollRef} className={styles.boardViewport} onScroll={syncHeaderScroll}>
+              <div className={styles.board}>
+                {COLUMNAS.map((col) => (
+                  <PredioColumn
+                    key={col.key}
+                    colKey={col.key}
+                    predios={filteredPipelinePredios.filter((predio) => predio.estado === col.key)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
           <DragOverlay dropAnimation={null}>
