@@ -214,7 +214,7 @@ export default function PrediosPage() {
   }
 
   return (
-    <div>
+    <div className={styles.page}>
       <div className={styles.header}>
         <div>
           <div className="section-label"><span className="line" />🏘️ Adquisición</div>
