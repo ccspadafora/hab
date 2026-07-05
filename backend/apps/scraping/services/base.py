@@ -9,6 +9,9 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
+from apps.leads.models import Propietario, PropietarioPredio
+from apps.scraping.models import Predio
+
 
 @dataclass
 class ScrapingRunResult:
@@ -50,6 +53,81 @@ class BaseScraper:
         response = self.session.get(url, timeout=30)
         response.raise_for_status()
         return BeautifulSoup(response.text, "html.parser")
+
+    def find_existing_predio(self, payload: dict) -> Predio | None:
+        codigo_externo = (payload.get("codigo_externo") or "").strip()
+        url_origen = payload.get("url_origen")
+
+        if codigo_externo:
+            existing = Predio.objects.filter(
+                fuente=self.fuente,
+                codigo_externo=codigo_externo,
+            ).first()
+            if existing:
+                return existing
+
+        if url_origen:
+            return Predio.objects.filter(url_origen=url_origen).first()
+        return None
+
+    def upsert_propietario_contacto(self, predio: Predio, contacto: dict) -> None:
+        phones = contacto.get("phones") or []
+        emails = contacto.get("emails") or []
+        whatsapp_phone = contacto.get("whatsapp_phone") or ""
+        telefono_principal = whatsapp_phone or (phones[0] if phones else "")
+        email = emails[0] if emails else ""
+
+        if not telefono_principal:
+            return
+
+        propietario = None
+        if whatsapp_phone:
+            propietario = Propietario.objects.filter(whatsapp_phone=whatsapp_phone).first()
+        if not propietario and telefono_principal:
+            propietario = Propietario.objects.filter(telefono_principal=telefono_principal).first()
+        if not propietario and email:
+            propietario = Propietario.objects.filter(email=email).first()
+
+        source_name = self.source_key.replace("_", " ").title()
+        nombre = contacto.get("publisher_name") or f"Contacto {source_name} {predio.codigo_externo or predio.id}"
+
+        if propietario:
+            changed = False
+            if email and not propietario.email:
+                propietario.email = email
+                changed = True
+            if whatsapp_phone and not propietario.whatsapp_phone:
+                propietario.whatsapp_phone = whatsapp_phone
+                changed = True
+            if telefono_principal and not propietario.telefono_principal:
+                propietario.telefono_principal = telefono_principal
+                changed = True
+            if contacto.get("publisher_name") and propietario.nombre.startswith("Contacto "):
+                propietario.nombre = nombre
+                changed = True
+            if changed:
+                propietario.save()
+        else:
+            propietario = Propietario.objects.create(
+                nombre=nombre,
+                telefono_principal=telefono_principal,
+                email=email,
+                whatsapp_phone=whatsapp_phone,
+                ciudad=predio.ciudad,
+                fuente_origen=f"scraping_{self.source_key}",
+                etiquetas=["captado_scraping", self.source_key],
+            )
+
+        PropietarioPredio.objects.get_or_create(
+            propietario=propietario,
+            predio=predio,
+            rol="propietario",
+            defaults={
+                "porcentaje_propiedad": 100,
+                "es_contacto_principal": True,
+                "notas": f"Asociado automáticamente desde scraping de {source_name}.",
+            },
+        )
 
     @staticmethod
     def absolute_url(base_url: str, href: str | None) -> str | None:

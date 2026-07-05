@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 
+from .ciencuadras import CienCuadrasScraper
 from .fincaraiz import FincaRaizScraper
 
 
@@ -9,5 +10,7 @@ def get_scraper_for_fuente(fuente, config=None):
 
     if "fincaraiz" in source_name or "fincaraiz" in source_host:
         return FincaRaizScraper(fuente=fuente, config=config)
+    if "ciencuadras" in source_name or "ciencuadras" in source_host:
+        return CienCuadrasScraper(fuente=fuente, config=config)
 
     raise ValueError(f"No existe scraper implementado para la fuente '{fuente.nombre}'.")

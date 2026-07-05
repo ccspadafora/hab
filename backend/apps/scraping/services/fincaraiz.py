@@ -131,7 +131,10 @@ class FincaRaizScraper(BaseScraper):
                 continue
             if not re.search(r"/\d{6,}$", parsed.path):
                 continue
-            if any(skip in parsed.path for skip in ("/inmobiliaria/", "/proyecto-", "/constructora/")):
+            if any(
+                skip in parsed.path
+                for skip in ("/inmobiliaria/", "/inmobiliarias/", "/proyecto-", "/constructora/")
+            ):
                 continue
             detail_urls.append(f"{parsed.scheme}://{parsed.netloc}{parsed.path}")
         return self.dedupe_keep_order(detail_urls)
@@ -149,6 +152,7 @@ class FincaRaizScraper(BaseScraper):
         codigo = self._extract_codigo(strings, detail_url)
         price = self._extract_price(strings)
         area_top = self._extract_area_top(strings)
+        contacto = self._extract_contact_info(soup, strings, detail_url)
 
         barrio, localidad, ciudad = self._extract_location_parts(title, location_label, ubicacion)
         tipo = self._extract_tipo(title, details)
@@ -186,6 +190,7 @@ class FincaRaizScraper(BaseScraper):
                 "detail_map": details,
                 "imagenes": imagenes,
                 "source": self.source_key,
+                "contacto": contacto,
             },
         }
 
@@ -349,6 +354,79 @@ class FincaRaizScraper(BaseScraper):
             urls.append(absolute)
         return self.dedupe_keep_order(urls)[:12]
 
+    def _extract_contact_info(self, soup, strings: list[str], detail_url: str) -> dict:
+        page_text = " ".join(strings)
+        emails = self._extract_emails(page_text)
+        phones = self._extract_phones(page_text)
+        whatsapp_links = self._extract_whatsapp_links(soup, detail_url)
+        publisher_name = self._extract_publisher_name(strings)
+
+        whatsapp_phone = ""
+        if whatsapp_links:
+            whatsapp_phone = self._extract_phone_from_whatsapp_url(whatsapp_links[0]) or ""
+            if whatsapp_phone and whatsapp_phone not in phones:
+                phones.insert(0, whatsapp_phone)
+
+        return {
+            "publisher_name": publisher_name,
+            "emails": emails,
+            "phones": phones,
+            "whatsapp_links": whatsapp_links,
+            "whatsapp_phone": whatsapp_phone,
+            "has_direct_contact": bool(emails or phones or whatsapp_links),
+        }
+
+    def _extract_publisher_name(self, strings: list[str]) -> str:
+        for index, item in enumerate(strings):
+            if item.startswith("Código Fincaraíz:") and index + 1 < len(strings):
+                candidate = strings[index + 1]
+                if candidate not in {"Completa tus datos para habilitar el medio de contacto", "Contactar"}:
+                    return candidate
+        return ""
+
+    def _extract_emails(self, text: str) -> list[str]:
+        matches = re.findall(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", text, flags=re.IGNORECASE)
+        return self.dedupe_keep_order([email.lower() for email in matches])
+
+    def _extract_phones(self, text: str) -> list[str]:
+        matches = re.findall(r"(?:\+?57[\s-]?)?(?:3\d{2}|60\d)[\s-]?\d{3}[\s-]?\d{4}", text)
+        normalized = [self._normalize_phone(match) for match in matches]
+        normalized = [phone for phone in normalized if phone]
+        return self.dedupe_keep_order(normalized)
+
+    def _extract_whatsapp_links(self, soup, detail_url: str) -> list[str]:
+        links: list[str] = []
+        for anchor in soup.select("a[href]"):
+            href = anchor.get("href") or ""
+            if "wa.me/" not in href and "whatsapp.com/" not in href and "api.whatsapp.com/" not in href:
+                continue
+            absolute = self.absolute_url(detail_url, href)
+            if absolute:
+                links.append(absolute)
+        return self.dedupe_keep_order(links)
+
+    def _extract_phone_from_whatsapp_url(self, url: str) -> str | None:
+        match = re.search(r"(?:wa\.me/|phone=)(\d{10,15})", url)
+        if not match:
+            return None
+        return self._normalize_phone(match.group(1))
+
+    def _normalize_phone(self, value: str | None) -> str:
+        if not value:
+            return ""
+        digits = re.sub(r"\D+", "", value)
+        if not digits:
+            return ""
+        if digits.startswith("57") and len(digits) >= 12:
+            digits = digits[2:]
+        if len(digits) == 10 and digits.startswith("3"):
+            return f"+57{digits}"
+        if len(digits) == 10 and digits.startswith("60"):
+            return f"+57{digits}"
+        if len(digits) == 7:
+            return digits
+        return f"+{digits}" if not value.startswith("+") else value
+
     def _compute_precio_m2(self, precio: Decimal | None, area: Decimal | None) -> Decimal | None:
         if not precio or not area:
             return None
@@ -405,16 +483,19 @@ class FincaRaizScraper(BaseScraper):
 
     @transaction.atomic
     def _upsert_predio(self, payload: dict) -> bool:
-        obj = Predio.objects.filter(url_origen=payload["url_origen"]).first()
+        obj = self.find_existing_predio(payload)
+        contacto = payload.get("raw_data", {}).get("contacto", {})
         if obj:
             for field, value in payload.items():
                 setattr(obj, field, value)
             obj.save()
+            self.upsert_propietario_contacto(obj, contacto)
             return False
 
-        Predio.objects.create(
+        predio = Predio.objects.create(
             fuente=self.fuente,
             estado="para_estudio",
             **payload,
         )
+        self.upsert_propietario_contacto(predio, contacto)
         return True
