@@ -349,7 +349,7 @@ export default function PrediosPage() {
         <Modal title="🎛️ Filtros avanzados" onClose={() => setShowFilters(false)} wide>
           <div className={styles.filtersModalBody}>
             <div className={styles.advancedFilters}>
-              <div className={styles.filterSection}>
+              <div className={`${styles.filterSection} ${styles.cityCard}`}>
                 <label className={styles.filterLabel}>Ciudad</label>
                 <select className={`input ${styles.selWide}`} value={ciudad} onChange={(e) => setCiudad(e.target.value)}>
                   <option value="">Todas las ciudades</option>
@@ -357,7 +357,7 @@ export default function PrediosPage() {
                 </select>
               </div>
 
-              <div className={`${styles.filterSection} ${styles.filterSectionWide}`}>
+              <div className={`${styles.filterSection} ${styles.filterSectionWide} ${styles.localidadesCard}`}>
                 <label className={styles.filterLabel}>Localidades</label>
                 <div className={styles.chipGrid}>
                   {LOCALIDADES.map((item) => (
@@ -373,7 +373,7 @@ export default function PrediosPage() {
                 </div>
               </div>
 
-              <div className={styles.filterSection}>
+              <div className={`${styles.filterSection} ${styles.estratoCard}`}>
                 <label className={styles.filterLabel}>Estrato</label>
                 <div className={styles.inlineInputs}>
                   <select className={`input ${styles.miniInput}`} value={estratoMin} onChange={(e) => setEstratoMin(Math.min(Number(e.target.value), estratoMax))}>
@@ -385,7 +385,7 @@ export default function PrediosPage() {
                 </div>
               </div>
 
-              <div className={`${styles.filterSection} ${styles.rangeCard}`}>
+              <div className={`${styles.filterSection} ${styles.rangeCard} ${styles.precioCard}`}>
                 <div className={styles.rangeTop}>
                   <label className={styles.filterLabel}>Precio publicado</label>
                   <span className={styles.rangeValue}>
@@ -432,7 +432,7 @@ export default function PrediosPage() {
                 </div>
               </div>
 
-              <div className={`${styles.filterSection} ${styles.rangeCard}`}>
+              <div className={`${styles.filterSection} ${styles.rangeCard} ${styles.scoreCard}`}>
                 <div className={styles.rangeTop}>
                   <label className={styles.filterLabel}>Score prefactibilidad</label>
                   <span className={styles.rangeValue}>{scoreMin} - {scoreMax}</span>

@@ -93,12 +93,13 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+  overflow-x: hidden;
 }
 
 .advancedFilters {
   display: grid;
-  grid-template-columns: 180px minmax(280px, 1.4fr) 180px 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 14px;
   align-items: start;
 }
 
@@ -106,12 +107,19 @@
   border: 1px solid rgba(43,77,46,0.1);
   border-radius: 18px;
   background: rgba(255,255,255,0.84);
-  padding: 12px;
+  padding: 16px;
+  min-width: 0;
 }
 
 .filterSectionWide {
-  grid-column: span 2;
+  grid-column: span 12;
 }
+
+.cityCard { grid-column: span 3; }
+.localidadesCard { grid-column: span 6; }
+.estratoCard { grid-column: span 3; }
+.precioCard { grid-column: span 6; }
+.scoreCard { grid-column: span 6; }
 
 .filterLabel {
   display: block;
@@ -127,6 +135,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: flex-start;
 }
 
 .chip {
@@ -165,6 +174,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
 }
 
 .rangeTop {
@@ -697,12 +707,17 @@
 
 @media (max-width: 1200px) {
   .advancedFilters {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .filterSectionWide {
-    grid-column: span 2;
-  }
+  .filterSectionWide,
+  .cityCard,
+  .localidadesCard,
+  .estratoCard,
+  .precioCard,
+  .scoreCard { grid-column: span 1; }
+
+  .localidadesCard { grid-column: 1 / -1; }
 }
 
 @media (max-width: 900px) {
@@ -710,9 +725,12 @@
     grid-template-columns: 1fr;
   }
 
-  .filterSectionWide {
-    grid-column: span 1;
-  }
+  .filterSectionWide,
+  .cityCard,
+  .localidadesCard,
+  .estratoCard,
+  .precioCard,
+  .scoreCard { grid-column: span 1; }
 
   .inlineInputs {
     grid-template-columns: 1fr;
