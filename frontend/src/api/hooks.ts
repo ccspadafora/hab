@@ -23,7 +23,20 @@ export interface PrediosFilter {
   estado?: string
   barrio?: string
   tipo?: string
+  tipos?: string | string[]
+  ciudad?: string
+  ciudades?: string | string[]
+  localidad?: string
+  localidades?: string | string[]
   estrato?: number
+  estrato_min?: number
+  estrato_max?: number
+  precio_min?: number
+  precio_max?: number
+  score_min?: number
+  score_max?: number
+  area_min?: number
+  area_max?: number
   search?: string
   ordering?: string
   page?: number
@@ -45,10 +58,10 @@ export function usePredio(id: number) {
   })
 }
 
-export function usePredioPipeline() {
+export function usePredioPipeline(filters?: PrediosFilter) {
   return useQuery({
-    queryKey: ['predios', 'pipeline'],
-    queryFn: () => get<Record<string, { label: string; count: number; predios: Predio[] }>>('/predios/pipeline/'),
+    queryKey: ['predios', 'pipeline', filters],
+    queryFn: () => get<Record<string, { label: string; count: number; predios: Predio[] }>>('/predios/pipeline/', filters),
   })
 }
 
@@ -122,6 +135,8 @@ export interface LeadsFilter {
   temperatura?: string
   asesor?: number
   search?: string
+  page?: number
+  page_size?: number
 }
 
 export function useLeads(filters?: LeadsFilter) {

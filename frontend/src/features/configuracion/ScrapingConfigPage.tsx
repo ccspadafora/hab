@@ -8,7 +8,7 @@ interface Fuente {
   configuracion: Record<string, unknown>
 }
 interface ConfigScraping {
-  id: number; fuente: number; barrios_objetivo: string[]; localidades: string[]
+  id: number; fuente: number; ciudades: string[]; barrios_objetivo: string[]; localidades: string[]
   tipos_predio: string[]; estrato_min: number; estrato_max: number
   precio_min: string | null; precio_max: string | null; area_lote_min: string | null
   frecuencia_cron: string; max_paginas: number; delay_entre_paginas: number
@@ -27,11 +27,18 @@ interface EjecucionScraping {
 }
 
 const TIPOS_PREDIO = ['casa','lote','apartamento','local']
+const CIUDADES = ['Bogotá', 'Chía', 'Cajicá', 'La Calera', 'Sopó', 'Cota', 'Mosquera', 'Funza', 'Madrid', 'Zipaquirá']
 const LOCALIDADES  = ['Chapinero','Usaquén','Suba','Kennedy','Fontibón','Engativá',
                       'Teusaquillo','Barrios Unidos','Santa Fe','La Candelaria','Rafael Uribe','Bosa']
 
 export default function ScrapingConfigPage() {
   const qc = useQueryClient()
+  const [selectedFuente, setSelectedFuente] = useState<Fuente | null>(null)
+  const [editFuente,     setEditFuente]     = useState<Partial<Fuente> | null>(null)
+  const [config,         setConfig]         = useState<Partial<ConfigScraping> | null>(null)
+  const [saving,         setSaving]         = useState(false)
+  const [running,        setRunning]        = useState(false)
+  const [msg,            setMsg]            = useState('')
 
   const { data: fuentes }   = useQuery({ queryKey: ['scraping','fuentes'],   queryFn: () => apiClient.get('/scraping/fuentes/').then(r => r.data as { results: Fuente[] }) })
   const { data: configList } = useQuery({ queryKey: ['scraping','config'],   queryFn: () => apiClient.get('/config/scraping/').then(r => r.data as { results: ConfigScraping[] }) })
@@ -45,19 +52,12 @@ export default function ScrapingConfigPage() {
     },
   })
 
-  const [selectedFuente, setSelectedFuente] = useState<Fuente | null>(null)
-  const [editFuente,     setEditFuente]     = useState<Partial<Fuente> | null>(null)
-  const [config,         setConfig]         = useState<Partial<ConfigScraping> | null>(null)
-  const [saving,         setSaving]         = useState(false)
-  const [running,        setRunning]        = useState(false)
-  const [msg,            setMsg]            = useState('')
-
   const abrirFuente = (f: Fuente) => {
     setSelectedFuente(f)
-    setEditFuente({ nombre: f.nombre, url_base: f.url_base, activo: f.activo })
+    setEditFuente({ nombre: f.nombre, url_base: f.url_base, activo: f.activo, configuracion: { ...f.configuracion } })
     const cfg = configList?.results.find(c => c.fuente === f.id)
     setConfig(cfg ? { ...cfg } : {
-      fuente: f.id, barrios_objetivo: [], localidades: [], tipos_predio: [],
+      fuente: f.id, ciudades: [], barrios_objetivo: [], localidades: [], tipos_predio: [],
       estrato_min: 3, estrato_max: 6, precio_min: null, precio_max: null,
       area_lote_min: null, frecuencia_cron: '0 6 * * *', max_paginas: 20,
       delay_entre_paginas: 3, umbral_score_auto_viable: 65, umbral_score_auto_noviable: 30,
@@ -98,6 +98,7 @@ export default function ScrapingConfigPage() {
       qc.invalidateQueries({ queryKey: ['scraping', 'config'] })
       setConfig({
         fuente: selectedFuente.id,
+        ciudades: [],
         barrios_objetivo: [],
         localidades: [],
         tipos_predio: [],
@@ -245,12 +246,40 @@ export default function ScrapingConfigPage() {
                       <option value="false">❌ Inactiva</option>
                     </select>
                   </div>
+                  <div className={styles.field}>
+                    <label className={styles.fl}>Ruta ciudad / slug</label>
+                    <input
+                      className="input"
+                      value={String(editFuente.configuracion?.city_path ?? '')}
+                      onChange={e => setEditFuente(f => ({
+                        ...f!,
+                        configuracion: {
+                          ...(f?.configuracion ?? {}),
+                          city_path: e.target.value,
+                        },
+                      }))}
+                      placeholder="Ej: bogota/bogota-dc"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Filtros geográficos */}
               <div className={styles.panelSection}>
                 <h3 className={styles.secTitle}>📍 Zonas objetivo</h3>
+                <div className={styles.field}>
+                  <label className={styles.fl}>Ciudades (selecciona las que aplican)</label>
+                  <div className={styles.checkGrid}>
+                    {CIUDADES.map(city => (
+                      <label key={city} className={styles.checkItem}>
+                        <input type="checkbox"
+                          checked={(config.ciudades ?? []).includes(city)}
+                          onChange={() => setArr('ciudades', city)} />
+                        {city}
+                      </label>
+                    ))}
+                  </div>
+                </div>
                 <div className={styles.field}>
                   <label className={styles.fl}>Localidades (selecciona las que aplican)</label>
                   <div className={styles.checkGrid}>

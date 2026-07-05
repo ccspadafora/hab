@@ -59,7 +59,7 @@
 .filters {
   display: flex;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
   align-items: center;
   width: 100%;
@@ -68,6 +68,104 @@
 
 .search { flex: 1; min-width: 220px; }
 .sel { width: 180px; }
+.selWide { width: 100%; }
+
+.advancedFilters {
+  display: grid;
+  grid-template-columns: 180px minmax(280px, 1.4fr) 180px 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: start;
+}
+
+.filterSection {
+  border: 1px solid rgba(43,77,46,0.1);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.84);
+  padding: 12px;
+}
+
+.filterSectionWide {
+  grid-column: span 2;
+}
+
+.filterLabel {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(43,77,46,0.74);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  border: 1px solid rgba(43,77,46,0.14);
+  border-radius: 999px;
+  background: #fff;
+  color: rgba(43,77,46,0.75);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px 12px;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.chip:hover {
+  border-color: rgba(43,77,46,0.28);
+}
+
+.chipActive {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: var(--blanco);
+}
+
+.inlineInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.miniInput {
+  width: 100%;
+}
+
+.rangeCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rangeTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rangeValue {
+  color: rgba(43,77,46,0.72);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rangeInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--verde);
+}
 
 .hint {
   margin-bottom: 10px;
@@ -550,3 +648,27 @@
 
 .loading { padding: 40px; text-align: center; color: #999; font-size: 14px; }
 .empty  { padding: 40px; text-align: center; color: #bbb; font-size: 13px; }
+
+@media (max-width: 1200px) {
+  .advancedFilters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filterSectionWide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 900px) {
+  .advancedFilters {
+    grid-template-columns: 1fr;
+  }
+
+  .filterSectionWide {
+    grid-column: span 1;
+  }
+
+  .inlineInputs {
+    grid-template-columns: 1fr;
+  }
+}

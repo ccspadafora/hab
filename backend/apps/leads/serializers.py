@@ -43,7 +43,18 @@ class CitaSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Cita
         fields = '__all__'
-        read_only_fields = ['id', 'creado_en']
+        read_only_fields = ['id', 'creado_en', 'lead', 'asesor']
+
+    def validate(self, attrs):
+        modalidad = attrs.get('modalidad')
+        ubicacion = (attrs.get('ubicacion') or '').strip()
+        url_meet = (attrs.get('url_meet') or '').strip()
+
+        if modalidad == 'presencial' and not ubicacion:
+            raise serializers.ValidationError({'ubicacion': ['La ubicación es requerida para citas presenciales.']})
+        if modalidad == 'videollamada' and not url_meet:
+            raise serializers.ValidationError({'url_meet': ['La URL de la reunión es requerida para videollamadas.']})
+        return attrs
 
 
 class LeadSerializer(serializers.ModelSerializer):

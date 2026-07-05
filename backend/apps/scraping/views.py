@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 from django.utils import timezone
 from .models import FuenteScraping, ZonaPOT, Predio, EjecucionScraping
 from .serializers import (
@@ -58,8 +59,70 @@ class PredioViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends    = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields   = ['estado', 'tipo', 'estrato', 'barrio', 'localidad']
-    search_fields      = ['barrio', 'localidad', 'direccion', 'codigo_externo']
+    search_fields      = ['barrio', 'localidad', 'ciudad', 'direccion', 'codigo_externo']
     ordering_fields    = ['score_prefactibilidad', 'primera_deteccion', 'precio_publicado']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        params = self.request.query_params
+
+        def _list_param(name: str):
+            raw = params.getlist(name)
+            if len(raw) == 1 and ',' in raw[0]:
+                raw = raw[0].split(',')
+            return [item.strip() for item in raw if str(item).strip()]
+
+        ciudades = _list_param('ciudades')
+        if not ciudades and params.get('ciudad'):
+            ciudades = [params.get('ciudad', '').strip()]
+        if ciudades:
+            qs = qs.filter(ciudad__in=ciudades)
+
+        localidades = _list_param('localidades')
+        if localidades:
+            qs = qs.filter(localidad__in=localidades)
+
+        barrios = _list_param('barrios')
+        if barrios:
+            query = Q()
+            for barrio in barrios:
+                query |= Q(barrio__iexact=barrio)
+            qs = qs.filter(query)
+
+        tipos = _list_param('tipos')
+        if tipos:
+            qs = qs.filter(tipo__in=tipos)
+
+        for field, cast in (
+            ('estrato_min', int),
+            ('estrato_max', int),
+            ('score_min', float),
+            ('score_max', float),
+            ('precio_min', float),
+            ('precio_max', float),
+            ('area_min', float),
+            ('area_max', float),
+        ):
+            raw = params.get(field)
+            if raw in (None, ''):
+                continue
+            try:
+                value = cast(raw)
+            except (TypeError, ValueError):
+                continue
+            lookup = {
+                'estrato_min': 'estrato__gte',
+                'estrato_max': 'estrato__lte',
+                'score_min': 'score_prefactibilidad__gte',
+                'score_max': 'score_prefactibilidad__lte',
+                'precio_min': 'precio_publicado__gte',
+                'precio_max': 'precio_publicado__lte',
+                'area_min': 'area_lote__gte',
+                'area_max': 'area_lote__lte',
+            }[field]
+            qs = qs.filter(**{lookup: value})
+
+        return qs
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -137,13 +200,13 @@ class PredioViewSet(viewsets.ModelViewSet):
     def pipeline(self, request):
         """Agrupa predios por estado para la vista kanban."""
         from apps.scraping.models import ESTADO_PREDIO_CHOICES
-        qs = self.get_queryset()
+        qs = self.filter_queryset(self.get_queryset())
         result = {}
         for estado, label in ESTADO_PREDIO_CHOICES:
             predios = qs.filter(estado=estado)
             result[estado] = {
                 'label':   label,
                 'count':   predios.count(),
-                'predios': PredioListSerializer(predios[:50], many=True).data,
+                'predios': PredioListSerializer(predios, many=True).data,
             }
         return Response(result)

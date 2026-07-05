@@ -34,6 +34,11 @@ const ESTADOS: EstadoPredio[] = [
   'descartado',
 ]
 const TIPOS   = ['casa','lote','apartamento','local']
+const CIUDADES = ['Bogotá', 'Chía', 'Cajicá', 'La Calera', 'Sopó', 'Cota', 'Mosquera', 'Funza', 'Madrid', 'Zipaquirá']
+const LOCALIDADES = ['Usaquén', 'Chapinero', 'Teusaquillo', 'Barrios Unidos', 'Suba', 'Engativá', 'Fontibón', 'Kennedy', 'Santa Fe', 'La Candelaria', 'Rafael Uribe', 'Bosa']
+const PRICE_MAX_LIMIT = 20_000_000_000
+const SCORE_MIN_LIMIT = 0
+const SCORE_MAX_LIMIT = 100
 const COLUMNAS: { key: EstadoPredio; label: string; accent: string; hint: string }[] = [
   { key: 'para_estudio',         label: 'Para estudio',                 accent: '#7B8D65', hint: 'predios por revisar y perfilar' },
   { key: 'contacto_inicial',     label: 'Contacto inicial',             accent: '#3F83D5', hint: 'primer acercamiento con propietario' },
@@ -66,6 +71,12 @@ function fmtCompactMoney(value: number | null) {
 function fmtNumber(value: number | null) {
   if (!value) return '—'
   return new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(value)
+}
+
+function toggleItem(list: string[], value: string) {
+  return list.includes(value)
+    ? list.filter((item) => item !== value)
+    : [...list, value]
 }
 
 function PredioCard({ predio, isDragging = false }: { predio: Predio; isDragging?: boolean }) {
@@ -154,8 +165,16 @@ function PredioColumn({ colKey, label, accent, hint, predios }: {
 export default function PrediosPage() {
   const [estado,    setEstado]    = useState('')
   const [tipo,      setTipo]      = useState('')
+  const [ciudad,    setCiudad]    = useState('')
+  const [localidades, setLocalidades] = useState<string[]>([])
   const [search,    setSearch]    = useState('')
   const [ordering,  setOrdering]  = useState('-primera_deteccion')
+  const [estratoMin, setEstratoMin] = useState(1)
+  const [estratoMax, setEstratoMax] = useState(6)
+  const [precioMin, setPrecioMin] = useState(0)
+  const [precioMax, setPrecioMax] = useState(PRICE_MAX_LIMIT)
+  const [scoreMin, setScoreMin] = useState(SCORE_MIN_LIMIT)
+  const [scoreMax, setScoreMax] = useState(SCORE_MAX_LIMIT)
   const [page,      setPage]      = useState(1)
   const [pageSize,  setPageSize]  = useState(20)
   const [showForm,  setShowForm]  = useState(false)
@@ -167,13 +186,35 @@ export default function PrediosPage() {
   const filters: PrediosFilter = {
     estado:   estado   || undefined,
     tipo:     tipo     || undefined,
+    ciudad:   ciudad   || undefined,
+    localidades: localidades.length ? localidades.join(',') : undefined,
+    estrato_min: estratoMin > 1 ? estratoMin : undefined,
+    estrato_max: estratoMax < 6 ? estratoMax : undefined,
+    precio_min: precioMin > 0 ? precioMin : undefined,
+    precio_max: precioMax < PRICE_MAX_LIMIT ? precioMax : undefined,
+    score_min: scoreMin > SCORE_MIN_LIMIT ? scoreMin : undefined,
+    score_max: scoreMax < SCORE_MAX_LIMIT ? scoreMax : undefined,
     search:   search   || undefined,
     ordering: ordering || undefined,
     page,
     page_size: pageSize,
   }
+  const pipelineFilters: PrediosFilter = {
+    estado: filters.estado,
+    tipo: filters.tipo,
+    ciudad: filters.ciudad,
+    localidades: filters.localidades,
+    estrato_min: filters.estrato_min,
+    estrato_max: filters.estrato_max,
+    precio_min: filters.precio_min,
+    precio_max: filters.precio_max,
+    score_min: filters.score_min,
+    score_max: filters.score_max,
+    search: filters.search,
+    ordering: filters.ordering,
+  }
   const { data, isLoading } = usePredios(filters)
-  const { data: pipelineData, isLoading: pipelineLoading } = usePredioPipeline()
+  const { data: pipelineData, isLoading: pipelineLoading } = usePredioPipeline(pipelineFilters)
   const updateEstado = useUpdatePredioEstado()
   const bulkUpdateEstado = useBulkUpdatePredioEstado()
   const bulkDelete = useBulkDeletePredios()
@@ -187,29 +228,14 @@ export default function PrediosPage() {
 
   useEffect(() => {
     setPage(1)
-  }, [estado, tipo, search, ordering, pageSize])
+  }, [estado, tipo, ciudad, localidades, search, ordering, estratoMin, estratoMax, precioMin, precioMax, scoreMin, scoreMax, pageSize])
 
   const pipelinePredios = useMemo(() => {
     if (!pipelineData) return []
     return ESTADOS.flatMap((key) => pipelineData[key]?.predios ?? [])
   }, [pipelineData])
 
-  const filteredPipelinePredios = useMemo(() => {
-    return pipelinePredios.filter((predio) => {
-      if (estado && predio.estado !== estado) return false
-      if (tipo && predio.tipo !== tipo) return false
-      if (!search) return true
-      const haystack = [
-        predio.direccion,
-        predio.barrio,
-        predio.localidad,
-        predio.ciudad,
-      ].join(' ').toLowerCase()
-      return haystack.includes(search.toLowerCase())
-    })
-  }, [pipelinePredios, estado, tipo, search])
-
-  const activePredio = filteredPipelinePredios.find((predio) => `predio-${predio.id}` === activeId) ?? null
+  const activePredio = pipelinePredios.find((predio) => `predio-${predio.id}` === activeId) ?? null
   const allVisibleSelected = tablaPredios.length > 0 && tablaPredios.every((p) => selectedIds.includes(p.id))
   const totalPredios = data?.count ?? 0
   const totalPages = Math.max(1, Math.ceil(totalPredios / pageSize))
@@ -251,7 +277,7 @@ export default function PrediosPage() {
     if (overId.startsWith('col-')) return overId.replace('col-', '') as EstadoPredio
     if (overId.startsWith('predio-')) {
       const id = Number(overId.replace('predio-', ''))
-      return filteredPipelinePredios.find((predio) => predio.id === id)?.estado
+      return pipelinePredios.find((predio) => predio.id === id)?.estado
     }
     return undefined
   }
@@ -264,9 +290,25 @@ export default function PrediosPage() {
     if (!over) return
     const predioId = Number(String(active.id).replace('predio-', ''))
     const target = getColumnState(String(over.id))
-    const current = filteredPipelinePredios.find((predio) => predio.id === predioId)?.estado
+    const current = pipelinePredios.find((predio) => predio.id === predioId)?.estado
     if (!target || target === current) return
     updateEstado.mutate({ id: predioId, estado: target })
+  }
+
+  const clearFilters = () => {
+    setEstado('')
+    setTipo('')
+    setCiudad('')
+    setLocalidades([])
+    setSearch('')
+    setOrdering('-primera_deteccion')
+    setEstratoMin(1)
+    setEstratoMax(6)
+    setPrecioMin(0)
+    setPrecioMax(PRICE_MAX_LIMIT)
+    setScoreMin(SCORE_MIN_LIMIT)
+    setScoreMax(SCORE_MAX_LIMIT)
+    setPage(1)
   }
 
   return (
@@ -333,15 +375,145 @@ export default function PrediosPage() {
           <option value="precio_publicado">Menor precio</option>
           <option value="-precio_publicado">Mayor precio</option>
         </select>
-        {(estado || tipo || search) && (
+        {(estado || tipo || ciudad || localidades.length || search || estratoMin > 1 || estratoMax < 6 || precioMin > 0 || precioMax < PRICE_MAX_LIMIT || scoreMin > 0 || scoreMax < 100) && (
           <button
             className="btn btn-ghost"
-            onClick={() => { setEstado(''); setTipo(''); setSearch(''); setPage(1) }}
+            onClick={clearFilters}
             style={{ fontSize: 11 }}
           >
             ✕ Limpiar filtros
           </button>
         )}
+      </div>
+
+      <div className={styles.advancedFilters}>
+        <div className={styles.filterSection}>
+          <label className={styles.filterLabel}>Ciudad</label>
+          <select className={`input ${styles.selWide}`} value={ciudad} onChange={(e) => setCiudad(e.target.value)}>
+            <option value="">Todas las ciudades</option>
+            {CIUDADES.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </div>
+
+        <div className={`${styles.filterSection} ${styles.filterSectionWide}`}>
+          <label className={styles.filterLabel}>Localidades</label>
+          <div className={styles.chipGrid}>
+            {LOCALIDADES.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={`${styles.chip} ${localidades.includes(item) ? styles.chipActive : ''}`}
+                onClick={() => setLocalidades((current) => toggleItem(current, item))}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.filterSection}>
+          <label className={styles.filterLabel}>Estrato</label>
+          <div className={styles.inlineInputs}>
+            <select className={`input ${styles.miniInput}`} value={estratoMin} onChange={(e) => setEstratoMin(Math.min(Number(e.target.value), estratoMax))}>
+              {[1, 2, 3, 4, 5, 6].map((item) => <option key={item} value={item}>Min {item}</option>)}
+            </select>
+            <select className={`input ${styles.miniInput}`} value={estratoMax} onChange={(e) => setEstratoMax(Math.max(Number(e.target.value), estratoMin))}>
+              {[1, 2, 3, 4, 5, 6].map((item) => <option key={item} value={item}>Max {item}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className={`${styles.filterSection} ${styles.rangeCard}`}>
+          <div className={styles.rangeTop}>
+            <label className={styles.filterLabel}>Precio publicado</label>
+            <span className={styles.rangeValue}>
+              {fmtCompactMoney(precioMin)} - {precioMax >= PRICE_MAX_LIMIT ? 'Sin tope' : fmtCompactMoney(precioMax)}
+            </span>
+          </div>
+          <div className={styles.inlineInputs}>
+            <input
+              className={`input ${styles.miniInput}`}
+              type="number"
+              min="0"
+              step="50000000"
+              value={precioMin}
+              onChange={(e) => setPrecioMin(Math.min(Number(e.target.value) || 0, precioMax))}
+            />
+            <input
+              className={`input ${styles.miniInput}`}
+              type="number"
+              min="0"
+              step="50000000"
+              value={precioMax}
+              onChange={(e) => setPrecioMax(Math.max(Number(e.target.value) || 0, precioMin))}
+            />
+          </div>
+          <div className={styles.rangeInputs}>
+            <input
+              className={styles.slider}
+              type="range"
+              min="0"
+              max={String(PRICE_MAX_LIMIT)}
+              step="50000000"
+              value={precioMin}
+              onChange={(e) => setPrecioMin(Math.min(Number(e.target.value), precioMax))}
+            />
+            <input
+              className={styles.slider}
+              type="range"
+              min="0"
+              max={String(PRICE_MAX_LIMIT)}
+              step="50000000"
+              value={precioMax}
+              onChange={(e) => setPrecioMax(Math.max(Number(e.target.value), precioMin))}
+            />
+          </div>
+        </div>
+
+        <div className={`${styles.filterSection} ${styles.rangeCard}`}>
+          <div className={styles.rangeTop}>
+            <label className={styles.filterLabel}>Score prefactibilidad</label>
+            <span className={styles.rangeValue}>{scoreMin} - {scoreMax}</span>
+          </div>
+          <div className={styles.inlineInputs}>
+            <input
+              className={`input ${styles.miniInput}`}
+              type="number"
+              min={String(SCORE_MIN_LIMIT)}
+              max={String(SCORE_MAX_LIMIT)}
+              value={scoreMin}
+              onChange={(e) => setScoreMin(Math.min(Number(e.target.value) || 0, scoreMax))}
+            />
+            <input
+              className={`input ${styles.miniInput}`}
+              type="number"
+              min={String(SCORE_MIN_LIMIT)}
+              max={String(SCORE_MAX_LIMIT)}
+              value={scoreMax}
+              onChange={(e) => setScoreMax(Math.max(Number(e.target.value) || 0, scoreMin))}
+            />
+          </div>
+          <div className={styles.rangeInputs}>
+            <input
+              className={styles.slider}
+              type="range"
+              min={String(SCORE_MIN_LIMIT)}
+              max={String(SCORE_MAX_LIMIT)}
+              step="1"
+              value={scoreMin}
+              onChange={(e) => setScoreMin(Math.min(Number(e.target.value), scoreMax))}
+            />
+            <input
+              className={styles.slider}
+              type="range"
+              min={String(SCORE_MIN_LIMIT)}
+              max={String(SCORE_MAX_LIMIT)}
+              step="1"
+              value={scoreMax}
+              onChange={(e) => setScoreMax(Math.max(Number(e.target.value), scoreMin))}
+            />
+          </div>
+        </div>
       </div>
 
       {view === 'pipeline' && (
@@ -515,7 +687,7 @@ export default function PrediosPage() {
                   label={col.label}
                   accent={col.accent}
                   hint={col.hint}
-                  predios={filteredPipelinePredios.filter((predio) => predio.estado === col.key)}
+                  predios={pipelinePredios.filter((predio) => predio.estado === col.key)}
                 />
               ))}
             </div>

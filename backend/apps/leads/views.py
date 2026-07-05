@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.utils import timezone
 from .models import Propietario, Lead, InteraccionLead, Cita
 from .serializers import (
     PropietarioSerializer,
@@ -60,5 +61,12 @@ class LeadViewSet(viewsets.ModelViewSet):
         lead = self.get_object()
         serializer = CitaSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(lead=lead, asesor=request.user)
+        cita = serializer.save(lead=lead, asesor=request.user)
+        lead.estado = 'cita_agendada'
+        lead.proxima_accion = cita.fecha_hora
+        lead.nota_proxima_accion = cita.notas or lead.nota_proxima_accion
+        if not lead.primer_contacto:
+            lead.primer_contacto = timezone.now()
+        lead.ultimo_contacto = timezone.now()
+        lead.save(update_fields=['estado', 'proxima_accion', 'nota_proxima_accion', 'primer_contacto', 'ultimo_contacto'])
         return Response(serializer.data, status=201)

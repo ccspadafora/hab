@@ -453,6 +453,10 @@ class FincaRaizScraper(BaseScraper):
         if not self.config:
             return True
 
+        ciudades = [str(item).strip().lower() for item in (getattr(self.config, "ciudades", None) or []) if str(item).strip()]
+        if ciudades and str(payload.get("ciudad") or "").strip().lower() not in ciudades:
+            return False
+
         localidades = [str(item).strip().lower() for item in (self.config.localidades or []) if str(item).strip()]
         if localidades and str(payload.get("localidad") or "").strip().lower() not in localidades:
             return False

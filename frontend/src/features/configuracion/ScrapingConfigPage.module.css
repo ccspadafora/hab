@@ -20,7 +20,7 @@
 .placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; color: #ccc; font-size: 14px; }
 .panelSection { padding: 20px 22px; border-bottom: 1px solid rgba(43,77,46,0.08); }
 .secTitle { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--verde); margin-bottom: 14px; }
-.fuenteForm { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 12px; }
+.fuenteForm { display: grid; grid-template-columns: 1fr 2fr 1fr 1.3fr; gap: 12px; }
 .filterGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .field { display: flex; flex-direction: column; gap: 5px; }
 .fl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--texto); }

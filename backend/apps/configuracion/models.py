@@ -44,6 +44,7 @@ class ConfiguracionScraping(models.Model):
         on_delete=models.CASCADE,
         related_name='configuracion_avanzada',
     )
+    ciudades            = models.JSONField(default=list)
     barrios_objetivo    = models.JSONField(default=list)
     localidades         = models.JSONField(default=list)
     tipos_predio        = models.JSONField(default=list)

@@ -3,6 +3,7 @@ import { useLeads } from '../../api/hooks'
 import { apiClient } from '../../api/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import styles from './CalendarioPage.module.css'
 
 function getDaysInMonth(year: number, month: number) { return new Date(year, month + 1, 0).getDate() }
@@ -16,7 +17,7 @@ export default function CalendarioPage() {
   const [mes, setMes]   = useState(now.getMonth())
   const [anio, setAnio] = useState(now.getFullYear())
 
-  const { data } = useLeads({})
+  const { data } = useLeads({ page_size: 200 })
   const qc = useQueryClient()
   const leads = data?.results ?? []
 
@@ -58,7 +59,27 @@ export default function CalendarioPage() {
       setModalOpen(false)
       setMsg('✅ Cita agendada correctamente')
       setTimeout(() => setMsg(''), 4000)
-    } catch { setMsg('❌ Error al agendar la cita') }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const payload = error.response?.data
+        if (typeof payload === 'string') {
+          setMsg(`❌ ${payload}`)
+        } else if (payload && typeof payload === 'object') {
+          const first = Object.entries(payload as Record<string, unknown>)[0]
+          if (first) {
+            const [, value] = first
+            const text = Array.isArray(value) ? String(value[0]) : String(value)
+            setMsg(`❌ ${text}`)
+          } else {
+            setMsg('❌ Error al agendar la cita')
+          }
+        } else {
+          setMsg('❌ Error al agendar la cita')
+        }
+      } else {
+        setMsg('❌ Error al agendar la cita')
+      }
+    }
     finally { setSaving(false) }
   }
 
