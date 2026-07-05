@@ -178,6 +178,7 @@ export default function PrediosPage() {
   const [page,      setPage]      = useState(1)
   const [pageSize,  setPageSize]  = useState(20)
   const [showForm,  setShowForm]  = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
   const [view,      setView]      = useState<'pipeline' | 'tabla'>('pipeline')
   const [activeId,  setActiveId]  = useState<string | null>(null)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
@@ -311,6 +312,14 @@ export default function PrediosPage() {
     setPage(1)
   }
 
+  const advancedFilterCount = [
+    ciudad ? 1 : 0,
+    localidades.length ? 1 : 0,
+    estratoMin > 1 || estratoMax < 6 ? 1 : 0,
+    precioMin > 0 || precioMax < PRICE_MAX_LIMIT ? 1 : 0,
+    scoreMin > 0 || scoreMax < 100 ? 1 : 0,
+  ].reduce((acc, value) => acc + value, 0)
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -334,6 +343,146 @@ export default function PrediosPage() {
       {showForm && (
         <Modal title="📍 Nuevo Predio" onClose={() => setShowForm(false)} wide>
           <PredioForm onClose={() => setShowForm(false)} />
+        </Modal>
+      )}
+      {showFilters && (
+        <Modal title="🎛️ Filtros avanzados" onClose={() => setShowFilters(false)} wide>
+          <div className={styles.filtersModalBody}>
+            <div className={styles.advancedFilters}>
+              <div className={styles.filterSection}>
+                <label className={styles.filterLabel}>Ciudad</label>
+                <select className={`input ${styles.selWide}`} value={ciudad} onChange={(e) => setCiudad(e.target.value)}>
+                  <option value="">Todas las ciudades</option>
+                  {CIUDADES.map((item) => <option key={item} value={item}>{item}</option>)}
+                </select>
+              </div>
+
+              <div className={`${styles.filterSection} ${styles.filterSectionWide}`}>
+                <label className={styles.filterLabel}>Localidades</label>
+                <div className={styles.chipGrid}>
+                  {LOCALIDADES.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`${styles.chip} ${localidades.includes(item) ? styles.chipActive : ''}`}
+                      onClick={() => setLocalidades((current) => toggleItem(current, item))}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.filterSection}>
+                <label className={styles.filterLabel}>Estrato</label>
+                <div className={styles.inlineInputs}>
+                  <select className={`input ${styles.miniInput}`} value={estratoMin} onChange={(e) => setEstratoMin(Math.min(Number(e.target.value), estratoMax))}>
+                    {[1, 2, 3, 4, 5, 6].map((item) => <option key={item} value={item}>Min {item}</option>)}
+                  </select>
+                  <select className={`input ${styles.miniInput}`} value={estratoMax} onChange={(e) => setEstratoMax(Math.max(Number(e.target.value), estratoMin))}>
+                    {[1, 2, 3, 4, 5, 6].map((item) => <option key={item} value={item}>Max {item}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className={`${styles.filterSection} ${styles.rangeCard}`}>
+                <div className={styles.rangeTop}>
+                  <label className={styles.filterLabel}>Precio publicado</label>
+                  <span className={styles.rangeValue}>
+                    {fmtCompactMoney(precioMin)} - {precioMax >= PRICE_MAX_LIMIT ? 'Sin tope' : fmtCompactMoney(precioMax)}
+                  </span>
+                </div>
+                <div className={styles.inlineInputs}>
+                  <input
+                    className={`input ${styles.miniInput}`}
+                    type="number"
+                    min="0"
+                    step="50000000"
+                    value={precioMin}
+                    onChange={(e) => setPrecioMin(Math.min(Number(e.target.value) || 0, precioMax))}
+                  />
+                  <input
+                    className={`input ${styles.miniInput}`}
+                    type="number"
+                    min="0"
+                    step="50000000"
+                    value={precioMax}
+                    onChange={(e) => setPrecioMax(Math.max(Number(e.target.value) || 0, precioMin))}
+                  />
+                </div>
+                <div className={styles.rangeInputs}>
+                  <input
+                    className={styles.slider}
+                    type="range"
+                    min="0"
+                    max={String(PRICE_MAX_LIMIT)}
+                    step="50000000"
+                    value={precioMin}
+                    onChange={(e) => setPrecioMin(Math.min(Number(e.target.value), precioMax))}
+                  />
+                  <input
+                    className={styles.slider}
+                    type="range"
+                    min="0"
+                    max={String(PRICE_MAX_LIMIT)}
+                    step="50000000"
+                    value={precioMax}
+                    onChange={(e) => setPrecioMax(Math.max(Number(e.target.value), precioMin))}
+                  />
+                </div>
+              </div>
+
+              <div className={`${styles.filterSection} ${styles.rangeCard}`}>
+                <div className={styles.rangeTop}>
+                  <label className={styles.filterLabel}>Score prefactibilidad</label>
+                  <span className={styles.rangeValue}>{scoreMin} - {scoreMax}</span>
+                </div>
+                <div className={styles.inlineInputs}>
+                  <input
+                    className={`input ${styles.miniInput}`}
+                    type="number"
+                    min={String(SCORE_MIN_LIMIT)}
+                    max={String(SCORE_MAX_LIMIT)}
+                    value={scoreMin}
+                    onChange={(e) => setScoreMin(Math.min(Number(e.target.value) || 0, scoreMax))}
+                  />
+                  <input
+                    className={`input ${styles.miniInput}`}
+                    type="number"
+                    min={String(SCORE_MIN_LIMIT)}
+                    max={String(SCORE_MAX_LIMIT)}
+                    value={scoreMax}
+                    onChange={(e) => setScoreMax(Math.max(Number(e.target.value) || 0, scoreMin))}
+                  />
+                </div>
+                <div className={styles.rangeInputs}>
+                  <input
+                    className={styles.slider}
+                    type="range"
+                    min={String(SCORE_MIN_LIMIT)}
+                    max={String(SCORE_MAX_LIMIT)}
+                    step="1"
+                    value={scoreMin}
+                    onChange={(e) => setScoreMin(Math.min(Number(e.target.value), scoreMax))}
+                  />
+                  <input
+                    className={styles.slider}
+                    type="range"
+                    min={String(SCORE_MIN_LIMIT)}
+                    max={String(SCORE_MAX_LIMIT)}
+                    step="1"
+                    value={scoreMax}
+                    onChange={(e) => setScoreMax(Math.max(Number(e.target.value), scoreMin))}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.filtersModalActions}>
+              <button className="btn btn-ghost" onClick={clearFilters}>Limpiar filtros</button>
+              <button className="btn btn-primary" onClick={() => setShowFilters(false)}>Aplicar</button>
+            </div>
+          </div>
         </Modal>
       )}
 
@@ -375,6 +524,9 @@ export default function PrediosPage() {
           <option value="precio_publicado">Menor precio</option>
           <option value="-precio_publicado">Mayor precio</option>
         </select>
+        <button className={styles.filterToggleBtn} onClick={() => setShowFilters(true)}>
+          Filtros {advancedFilterCount > 0 ? `(${advancedFilterCount})` : ''}
+        </button>
         {(estado || tipo || ciudad || localidades.length || search || estratoMin > 1 || estratoMax < 6 || precioMin > 0 || precioMax < PRICE_MAX_LIMIT || scoreMin > 0 || scoreMax < 100) && (
           <button
             className="btn btn-ghost"
@@ -386,135 +538,15 @@ export default function PrediosPage() {
         )}
       </div>
 
-      <div className={styles.advancedFilters}>
-        <div className={styles.filterSection}>
-          <label className={styles.filterLabel}>Ciudad</label>
-          <select className={`input ${styles.selWide}`} value={ciudad} onChange={(e) => setCiudad(e.target.value)}>
-            <option value="">Todas las ciudades</option>
-            {CIUDADES.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
+      {advancedFilterCount > 0 && (
+        <div className={styles.activeFiltersBar}>
+          {ciudad && <span className={styles.activeFilterChip}>Ciudad: {ciudad}</span>}
+          {!!localidades.length && <span className={styles.activeFilterChip}>Localidades: {localidades.length}</span>}
+          {(estratoMin > 1 || estratoMax < 6) && <span className={styles.activeFilterChip}>Estrato: {estratoMin}-{estratoMax}</span>}
+          {(precioMin > 0 || precioMax < PRICE_MAX_LIMIT) && <span className={styles.activeFilterChip}>Precio</span>}
+          {(scoreMin > 0 || scoreMax < 100) && <span className={styles.activeFilterChip}>Score: {scoreMin}-{scoreMax}</span>}
         </div>
-
-        <div className={`${styles.filterSection} ${styles.filterSectionWide}`}>
-          <label className={styles.filterLabel}>Localidades</label>
-          <div className={styles.chipGrid}>
-            {LOCALIDADES.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={`${styles.chip} ${localidades.includes(item) ? styles.chipActive : ''}`}
-                onClick={() => setLocalidades((current) => toggleItem(current, item))}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className={styles.filterSection}>
-          <label className={styles.filterLabel}>Estrato</label>
-          <div className={styles.inlineInputs}>
-            <select className={`input ${styles.miniInput}`} value={estratoMin} onChange={(e) => setEstratoMin(Math.min(Number(e.target.value), estratoMax))}>
-              {[1, 2, 3, 4, 5, 6].map((item) => <option key={item} value={item}>Min {item}</option>)}
-            </select>
-            <select className={`input ${styles.miniInput}`} value={estratoMax} onChange={(e) => setEstratoMax(Math.max(Number(e.target.value), estratoMin))}>
-              {[1, 2, 3, 4, 5, 6].map((item) => <option key={item} value={item}>Max {item}</option>)}
-            </select>
-          </div>
-        </div>
-
-        <div className={`${styles.filterSection} ${styles.rangeCard}`}>
-          <div className={styles.rangeTop}>
-            <label className={styles.filterLabel}>Precio publicado</label>
-            <span className={styles.rangeValue}>
-              {fmtCompactMoney(precioMin)} - {precioMax >= PRICE_MAX_LIMIT ? 'Sin tope' : fmtCompactMoney(precioMax)}
-            </span>
-          </div>
-          <div className={styles.inlineInputs}>
-            <input
-              className={`input ${styles.miniInput}`}
-              type="number"
-              min="0"
-              step="50000000"
-              value={precioMin}
-              onChange={(e) => setPrecioMin(Math.min(Number(e.target.value) || 0, precioMax))}
-            />
-            <input
-              className={`input ${styles.miniInput}`}
-              type="number"
-              min="0"
-              step="50000000"
-              value={precioMax}
-              onChange={(e) => setPrecioMax(Math.max(Number(e.target.value) || 0, precioMin))}
-            />
-          </div>
-          <div className={styles.rangeInputs}>
-            <input
-              className={styles.slider}
-              type="range"
-              min="0"
-              max={String(PRICE_MAX_LIMIT)}
-              step="50000000"
-              value={precioMin}
-              onChange={(e) => setPrecioMin(Math.min(Number(e.target.value), precioMax))}
-            />
-            <input
-              className={styles.slider}
-              type="range"
-              min="0"
-              max={String(PRICE_MAX_LIMIT)}
-              step="50000000"
-              value={precioMax}
-              onChange={(e) => setPrecioMax(Math.max(Number(e.target.value), precioMin))}
-            />
-          </div>
-        </div>
-
-        <div className={`${styles.filterSection} ${styles.rangeCard}`}>
-          <div className={styles.rangeTop}>
-            <label className={styles.filterLabel}>Score prefactibilidad</label>
-            <span className={styles.rangeValue}>{scoreMin} - {scoreMax}</span>
-          </div>
-          <div className={styles.inlineInputs}>
-            <input
-              className={`input ${styles.miniInput}`}
-              type="number"
-              min={String(SCORE_MIN_LIMIT)}
-              max={String(SCORE_MAX_LIMIT)}
-              value={scoreMin}
-              onChange={(e) => setScoreMin(Math.min(Number(e.target.value) || 0, scoreMax))}
-            />
-            <input
-              className={`input ${styles.miniInput}`}
-              type="number"
-              min={String(SCORE_MIN_LIMIT)}
-              max={String(SCORE_MAX_LIMIT)}
-              value={scoreMax}
-              onChange={(e) => setScoreMax(Math.max(Number(e.target.value) || 0, scoreMin))}
-            />
-          </div>
-          <div className={styles.rangeInputs}>
-            <input
-              className={styles.slider}
-              type="range"
-              min={String(SCORE_MIN_LIMIT)}
-              max={String(SCORE_MAX_LIMIT)}
-              step="1"
-              value={scoreMin}
-              onChange={(e) => setScoreMin(Math.min(Number(e.target.value), scoreMax))}
-            />
-            <input
-              className={styles.slider}
-              type="range"
-              min={String(SCORE_MIN_LIMIT)}
-              max={String(SCORE_MAX_LIMIT)}
-              step="1"
-              value={scoreMax}
-              onChange={(e) => setScoreMax(Math.max(Number(e.target.value), scoreMin))}
-            />
-          </div>
-        </div>
-      </div>
+      )}
 
       {view === 'pipeline' && (
         <p className={styles.hint}>Arrastra tarjetas entre columnas para mover el predio dentro del pipeline operativo.</p>

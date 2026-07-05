@@ -70,11 +70,35 @@
 .sel { width: 180px; }
 .selWide { width: 100%; }
 
+.filterToggleBtn {
+  min-height: 54px;
+  border-radius: 999px;
+  border: 1px solid rgba(43,77,46,0.14);
+  background: rgba(255,255,255,0.9);
+  color: var(--texto);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 0 18px;
+  text-transform: uppercase;
+}
+
+.filterToggleBtn:hover {
+  border-color: rgba(43,77,46,0.28);
+  background: #fff;
+}
+
+.filtersModalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 .advancedFilters {
   display: grid;
   grid-template-columns: 180px minmax(280px, 1.4fr) 180px 1fr 1fr;
   gap: 12px;
-  margin-bottom: 12px;
   align-items: start;
 }
 
@@ -165,6 +189,28 @@
 .slider {
   width: 100%;
   accent-color: var(--verde);
+}
+
+.filtersModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.activeFiltersBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.activeFilterChip {
+  border-radius: 999px;
+  background: rgba(43,77,46,0.08);
+  color: rgba(43,77,46,0.82);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px 12px;
 }
 
 .hint {
