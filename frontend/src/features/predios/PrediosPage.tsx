@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   DndContext, DragOverlay, PointerSensor,
@@ -13,6 +13,8 @@ import { CSS } from '@dnd-kit/utilities'
 import {
   usePredioPipeline,
   usePredios,
+  useBulkDeletePredios,
+  useBulkUpdatePredioEstado,
   useUpdatePredioEstado,
   type PrediosFilter,
 } from '../../api/hooks'
@@ -154,20 +156,38 @@ export default function PrediosPage() {
   const [tipo,      setTipo]      = useState('')
   const [search,    setSearch]    = useState('')
   const [ordering,  setOrdering]  = useState('-primera_deteccion')
+  const [page,      setPage]      = useState(1)
+  const [pageSize,  setPageSize]  = useState(20)
   const [showForm,  setShowForm]  = useState(false)
   const [view,      setView]      = useState<'pipeline' | 'tabla'>('pipeline')
   const [activeId,  setActiveId]  = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+  const [bulkEstado, setBulkEstado] = useState<EstadoPredio>('para_estudio')
 
   const filters: PrediosFilter = {
     estado:   estado   || undefined,
     tipo:     tipo     || undefined,
     search:   search   || undefined,
     ordering: ordering || undefined,
+    page,
+    page_size: pageSize,
   }
   const { data, isLoading } = usePredios(filters)
   const { data: pipelineData, isLoading: pipelineLoading } = usePredioPipeline()
   const updateEstado = useUpdatePredioEstado()
+  const bulkUpdateEstado = useBulkUpdatePredioEstado()
+  const bulkDelete = useBulkDeletePredios()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
+  const tablaPredios = data?.results ?? []
+
+  useEffect(() => {
+    const visibles = new Set(tablaPredios.map((p) => p.id))
+    setSelectedIds((prev) => prev.filter((id) => visibles.has(id)))
+  }, [data?.results])
+
+  useEffect(() => {
+    setPage(1)
+  }, [estado, tipo, search, ordering, pageSize])
 
   const pipelinePredios = useMemo(() => {
     if (!pipelineData) return []
@@ -190,6 +210,42 @@ export default function PrediosPage() {
   }, [pipelinePredios, estado, tipo, search])
 
   const activePredio = filteredPipelinePredios.find((predio) => `predio-${predio.id}` === activeId) ?? null
+  const allVisibleSelected = tablaPredios.length > 0 && tablaPredios.every((p) => selectedIds.includes(p.id))
+  const totalPredios = data?.count ?? 0
+  const totalPages = Math.max(1, Math.ceil(totalPredios / pageSize))
+  const fromItem = totalPredios === 0 ? 0 : (page - 1) * pageSize + 1
+  const toItem = totalPredios === 0 ? 0 : Math.min(page * pageSize, totalPredios)
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages)
+  }, [page, totalPages])
+
+  const togglePredio = (id: number) => {
+    setSelectedIds((prev) => prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id])
+  }
+
+  const toggleAllVisible = () => {
+    if (allVisibleSelected) {
+      setSelectedIds([])
+      return
+    }
+    setSelectedIds(tablaPredios.map((p) => p.id))
+  }
+
+  const handleBulkEstado = () => {
+    if (!selectedIds.length) return
+    bulkUpdateEstado.mutate(
+      { ids: selectedIds, estado: bulkEstado },
+      { onSuccess: () => setSelectedIds([]) },
+    )
+  }
+
+  const handleBulkDelete = () => {
+    if (!selectedIds.length) return
+    const ok = window.confirm(`¿Eliminar ${selectedIds.length} predios seleccionados? Esta acción no se puede deshacer.`)
+    if (!ok) return
+    bulkDelete.mutate(selectedIds, { onSuccess: () => setSelectedIds([]) })
+  }
 
   const getColumnState = (overId: string): EstadoPredio | undefined => {
     if (overId.startsWith('col-')) return overId.replace('col-', '') as EstadoPredio
@@ -280,7 +336,7 @@ export default function PrediosPage() {
         {(estado || tipo || search) && (
           <button
             className="btn btn-ghost"
-            onClick={() => { setEstado(''); setTipo(''); setSearch(''); }}
+            onClick={() => { setEstado(''); setTipo(''); setSearch(''); setPage(1) }}
             style={{ fontSize: 11 }}
           >
             ✕ Limpiar filtros
@@ -297,9 +353,74 @@ export default function PrediosPage() {
         <div className={styles.loading}>Cargando predios…</div>
       ) : view === 'tabla' ? (
         <div className={styles.tableWrap}>
+          <div className={styles.tableTopBar}>
+            <div className={styles.tableSummary}>
+              <strong>{totalPredios}</strong>
+              <span>predios totales</span>
+              <em>{`Mostrando ${fromItem}-${toItem}`}</em>
+            </div>
+            <div className={styles.pagerControls}>
+              <label className={styles.pageSizeLabel}>
+                <span>Items por página</span>
+                <select
+                  className={styles.pageSizeSel}
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                >
+                  {[20, 50, 100, 200].map((size) => <option key={size} value={size}>{size}</option>)}
+                </select>
+              </label>
+              <div className={styles.pager}>
+                <button
+                  className={styles.pagerBtn}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                >
+                  ← Anterior
+                </button>
+                <span className={styles.pageIndicator}>Página {page} de {totalPages}</span>
+                <button
+                  className={styles.pagerBtn}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                >
+                  Siguiente →
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className={styles.bulkBar}>
+            <label className={styles.bulkSelectAll}>
+              <input type="checkbox" checked={allVisibleSelected} onChange={toggleAllVisible} />
+              <span>{selectedIds.length} seleccionados</span>
+            </label>
+            <select
+              className={styles.bulkEstadoSel}
+              value={bulkEstado}
+              onChange={(e) => setBulkEstado(e.target.value as EstadoPredio)}
+              disabled={!selectedIds.length || bulkUpdateEstado.isPending || bulkDelete.isPending}
+            >
+              {COLUMNAS.map((col) => <option key={col.key} value={col.key}>{col.label}</option>)}
+            </select>
+            <button
+              className="btn btn-secondary"
+              onClick={handleBulkEstado}
+              disabled={!selectedIds.length || bulkUpdateEstado.isPending || bulkDelete.isPending}
+            >
+              {bulkUpdateEstado.isPending ? 'Aplicando…' : 'Cambiar estado'}
+            </button>
+            <button
+              className={styles.bulkDeleteBtn}
+              onClick={handleBulkDelete}
+              disabled={!selectedIds.length || bulkDelete.isPending || bulkUpdateEstado.isPending}
+            >
+              {bulkDelete.isPending ? 'Eliminando…' : 'Eliminar seleccionados'}
+            </button>
+          </div>
           <table className={styles.table}>
             <thead>
               <tr>
+                <th className={styles.checkboxCol}></th>
                 <th>Predio</th>
                 <th>Tipo</th>
                 <th>Área lote</th>
@@ -312,7 +433,14 @@ export default function PrediosPage() {
             </thead>
             <tbody>
               {data?.results.map((p) => (
-                <tr key={p.id}>
+                <tr key={p.id} className={selectedIds.includes(p.id) ? styles.rowSelected : ''}>
+                  <td className={styles.checkboxCol}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(p.id)}
+                      onChange={() => togglePredio(p.id)}
+                    />
+                  </td>
                   <td>
                     <p className={styles.direccion}>{p.direccion || '—'}</p>
                     <p className={styles.barrio}>{p.barrio} · {p.localidad}</p>
@@ -344,13 +472,32 @@ export default function PrediosPage() {
               ))}
               {!data?.results.length && (
                 <tr>
-                  <td colSpan={8} className={styles.empty}>
+                  <td colSpan={9} className={styles.empty}>
                     No hay predios con estos filtros
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+          <div className={styles.tableBottomBar}>
+            <span className={styles.pageIndicator}>Página {page} de {totalPages}</span>
+            <div className={styles.pager}>
+              <button
+                className={styles.pagerBtn}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+              >
+                ← Anterior
+              </button>
+              <button
+                className={styles.pagerBtn}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+              >
+                Siguiente →
+              </button>
+            </div>
+          </div>
         </div>
       ) : (
         <DndContext

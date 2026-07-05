@@ -3,6 +3,27 @@
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .field { display: flex; flex-direction: column; gap: 5px; }
 .fl { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--texto); }
+.optional { color: #9aa29a; font-weight: 600; letter-spacing: 1px; }
+.control {
+  width: 100%;
+  min-height: 56px;
+  border-radius: 22px;
+  border: 1px solid rgba(43,77,46,0.18);
+  background: #fff;
+  padding: 0 28px;
+  font-size: 18px;
+  color: var(--texto);
+}
+.controlError {
+  border-color: #d14f4f;
+  box-shadow: 0 0 0 3px rgba(209,79,79,0.12);
+  background: rgba(255, 245, 245, 0.9);
+}
+.errorText {
+  font-size: 11px;
+  color: #c43e3e;
+  margin-top: 2px;
+}
 .sectionTitle { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
   color: var(--verde); margin: 8px 0 12px; padding-top: 14px; border-top: 1px solid rgba(43,77,46,0.1); }
 .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;

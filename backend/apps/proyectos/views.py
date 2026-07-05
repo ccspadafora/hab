@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from .serializers import (
     ProyectoListSerializer,
     ProyectoDetalleSerializer,
+    ProyectoWriteSerializer,
     EstructuracionProyectoSerializer,
     HitoProyectoSerializer,
 )
@@ -35,10 +36,12 @@ class ProyectoViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return ProyectoDetalleSerializer
+        if self.action in ('create', 'update', 'partial_update'):
+            return ProyectoWriteSerializer
         return ProyectoListSerializer
 
     def perform_create(self, serializer):
-        serializer.save(gerente=self.request.user)
+        serializer.save()
 
     @action(detail=True, methods=['post'])
     def generar_estructuracion_ia(self, request, pk=None):

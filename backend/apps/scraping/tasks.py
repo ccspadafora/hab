@@ -48,7 +48,7 @@ def _determinar_estado_auto(score: float) -> str:
 
 
 @shared_task(bind=True, queue='scraping', max_retries=3)
-def task_ejecutar_scraping_fuente(self, fuente_id: int):
+def task_ejecutar_scraping_fuente(self, fuente_id: int, ejecucion_id: int | None = None):
     """
     Ejecuta el scraping de una fuente específica.
     Programado por Celery Beat según la frecuencia configurada.
@@ -60,11 +60,17 @@ def task_ejecutar_scraping_fuente(self, fuente_id: int):
     try:
         fuente = FuenteScraping.objects.get(pk=fuente_id, activo=True)
         config = ConfiguracionScraping.objects.filter(fuente=fuente).first()
-        ejecucion = EjecucionScraping.objects.create(
-            fuente=fuente,
-            inicio=timezone.now(),
-            estado='corriendo',
-        )
+        if ejecucion_id:
+            ejecucion = EjecucionScraping.objects.get(pk=ejecucion_id, fuente=fuente)
+            ejecucion.inicio = ejecucion.inicio or timezone.now()
+            ejecucion.estado = 'corriendo'
+            ejecucion.save(update_fields=['inicio', 'estado'])
+        else:
+            ejecucion = EjecucionScraping.objects.create(
+                fuente=fuente,
+                inicio=timezone.now(),
+                estado='corriendo',
+            )
         logger.info('scraping.inicio', extra={'fuente': fuente.nombre})
 
         scraper = get_scraper_for_fuente(fuente, config=config)
@@ -99,5 +105,10 @@ def task_ejecutar_scraping_fuente(self, fuente_id: int):
         )
 
     except Exception as exc:
+        if 'ejecucion' in locals():
+            ejecucion.fin = timezone.now()
+            ejecucion.estado = 'fallido'
+            ejecucion.log = f"{ejecucion.log}\nERROR: {exc}".strip()
+            ejecucion.save(update_fields=['fin', 'estado', 'log'])
         logger.exception('scraping.error', extra={'fuente_id': fuente_id})
         raise self.retry(exc=exc, countdown=2 ** self.request.retries * 60)

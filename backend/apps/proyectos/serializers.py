@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.text import slugify
 from .models import Proyecto, ProyectoPropietario, HitoProyecto, EstructuracionProyecto
 
 
@@ -90,3 +91,46 @@ class ProyectoDetalleSerializer(ProyectoListSerializer):
         if not total:
             return 0
         return round(obj.hitos.filter(completado=True).count() / total * 100)
+
+
+class ProyectoWriteSerializer(serializers.ModelSerializer):
+    slug = serializers.CharField(required=False, allow_blank=True)
+
+    class Meta:
+        model = Proyecto
+        fields = [
+            'id', 'predio', 'analisis', 'nombre', 'slug', 'codigo', 'fase', 'gerente',
+            'fee_estructuracion', 'pct_gerencia', 'pct_ventas', 'valor_total_estimado',
+            'presentacion_url', 'doc_estructuracion_url',
+            'fecha_estructuracion', 'fecha_presentacion', 'fecha_inicio_obra', 'fecha_entrega_estimada',
+        ]
+        read_only_fields = ['id']
+        extra_kwargs = {
+            'predio': {'required': True},
+            'analisis': {'required': True},
+            'nombre': {'required': True},
+            'codigo': {'required': True},
+            'gerente': {'required': True},
+        }
+
+    def validate_slug(self, value):
+        return slugify(value) if value else value
+
+    def validate(self, attrs):
+        nombre = attrs.get('nombre') or getattr(self.instance, 'nombre', '')
+        slug = attrs.get('slug') or slugify(nombre)
+        attrs['slug'] = self._ensure_unique_slug(slug)
+        return attrs
+
+    def _ensure_unique_slug(self, base_slug: str) -> str:
+        base_slug = base_slug or 'proyecto'
+        candidate = base_slug
+        qs = Proyecto.objects.all()
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        suffix = 2
+        while qs.filter(slug=candidate).exists():
+            candidate = f'{base_slug}-{suffix}'
+            suffix += 1
+        return candidate

@@ -1,8 +1,9 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.utils import timezone
 from .models import FuenteScraping, ZonaPOT, Predio, EjecucionScraping
 from .serializers import (
     FuenteScrapingSerializer,
@@ -24,8 +25,24 @@ class FuenteScrapingViewSet(viewsets.ModelViewSet):
     def ejecutar(self, request, pk=None):
         fuente = self.get_object()
         from apps.scraping.tasks import task_ejecutar_scraping_fuente
-        task = task_ejecutar_scraping_fuente.delay(fuente.pk)
-        return Response({'task_id': task.id, 'status': 'enqueued'})
+        ejecucion = EjecucionScraping.objects.create(
+            fuente=fuente,
+            inicio=timezone.now(),
+            estado='pendiente',
+            log='Scraping encolado desde el panel.',
+        )
+        task = task_ejecutar_scraping_fuente.delay(fuente.pk, ejecucion.pk)
+        return Response({
+            'task_id': task.id,
+            'status': 'enqueued',
+            'ejecucion': EjecucionScrapingSerializer(ejecucion).data,
+        })
+
+    @action(detail=True, methods=['get'])
+    def ejecuciones(self, request, pk=None):
+        fuente = self.get_object()
+        qs = fuente.ejecuciones.order_by('-inicio')[:10]
+        return Response(EjecucionScrapingSerializer(qs, many=True).data)
 
 
 class ZonaPOTViewSet(viewsets.ModelViewSet):
@@ -89,6 +106,32 @@ class PredioViewSet(viewsets.ModelViewSet):
         from apps.scraping.tasks import task_calcular_prefactibilidad
         task = task_calcular_prefactibilidad.delay(predio.pk)
         return Response({'task_id': task.id, 'status': 'enqueued'})
+
+    @action(detail=False, methods=['post'])
+    def bulk_estado(self, request):
+        ids = request.data.get('ids') or []
+        estado = request.data.get('estado')
+
+        if not isinstance(ids, list) or not ids:
+            return Response({'ids': ['Debes enviar al menos un predio.']}, status=status.HTTP_400_BAD_REQUEST)
+        estados_validos = {choice[0] for choice in Predio._meta.get_field('estado').choices}
+        if estado not in estados_validos:
+            return Response({'estado': ['Estado inválido.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        updated = Predio.objects.filter(id__in=ids).update(estado=estado, ultima_actualizacion=timezone.now())
+        return Response({'updated': updated, 'estado': estado})
+
+    @action(detail=False, methods=['post'])
+    def bulk_delete(self, request):
+        ids = request.data.get('ids') or []
+
+        if not isinstance(ids, list) or not ids:
+            return Response({'ids': ['Debes enviar al menos un predio.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        qs = Predio.objects.filter(id__in=ids)
+        total = qs.count()
+        qs.delete()
+        return Response({'deleted': total})
 
     @action(detail=False, methods=['get'])
     def pipeline(self, request):

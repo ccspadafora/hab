@@ -15,6 +15,9 @@ const post = <T>(url: string, body?: object) =>
 const patch = <T>(url: string, body?: object) =>
   apiClient.patch<T>(url, body).then((r) => r.data)
 
+const del = <T>(url: string, body?: object) =>
+  apiClient.delete<T>(url, { data: body }).then((r) => r.data)
+
 // ── Predios ───────────────────────────────────────────────
 export interface PrediosFilter {
   estado?: string
@@ -23,6 +26,8 @@ export interface PrediosFilter {
   estrato?: number
   search?: string
   ordering?: string
+  page?: number
+  page_size?: number
 }
 
 export function usePredios(filters?: PrediosFilter) {
@@ -55,6 +60,27 @@ export function useUpdatePredioEstado() {
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ['predios'] })
       qc.invalidateQueries({ queryKey: ['predio', vars.id] })
+    },
+  })
+}
+
+export function useBulkUpdatePredioEstado() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ ids, estado }: { ids: number[]; estado: string }) =>
+      post('/predios/bulk_estado/', { ids, estado }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['predios'] })
+    },
+  })
+}
+
+export function useBulkDeletePredios() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: number[]) => del('/predios/bulk_delete/', { ids }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['predios'] })
     },
   })
 }

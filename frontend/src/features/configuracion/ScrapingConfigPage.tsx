@@ -14,6 +14,17 @@ interface ConfigScraping {
   frecuencia_cron: string; max_paginas: number; delay_entre_paginas: number
   umbral_score_auto_viable: number; umbral_score_auto_noviable: number
 }
+interface EjecucionScraping {
+  id: number
+  fuente: number
+  inicio: string
+  fin: string | null
+  predios_encontrados: number
+  predios_nuevos: number
+  errores: number
+  log: string
+  estado: 'pendiente' | 'corriendo' | 'exitoso' | 'fallido'
+}
 
 const TIPOS_PREDIO = ['casa','lote','apartamento','local']
 const LOCALIDADES  = ['Chapinero','Usaquén','Suba','Kennedy','Fontibón','Engativá',
@@ -24,11 +35,21 @@ export default function ScrapingConfigPage() {
 
   const { data: fuentes }   = useQuery({ queryKey: ['scraping','fuentes'],   queryFn: () => apiClient.get('/scraping/fuentes/').then(r => r.data as { results: Fuente[] }) })
   const { data: configList } = useQuery({ queryKey: ['scraping','config'],   queryFn: () => apiClient.get('/config/scraping/').then(r => r.data as { results: ConfigScraping[] }) })
+  const { data: ejecuciones, isFetching: fetchingEjecuciones } = useQuery({
+    queryKey: ['scraping', 'ejecuciones', selectedFuente?.id],
+    enabled: Boolean(selectedFuente?.id),
+    queryFn: () => apiClient.get(`/scraping/fuentes/${selectedFuente!.id}/ejecuciones/`).then(r => r.data as EjecucionScraping[]),
+    refetchInterval: (query) => {
+      const rows = (query.state.data as EjecucionScraping[] | undefined) ?? []
+      return rows.some(row => row.estado === 'pendiente' || row.estado === 'corriendo') ? 3000 : false
+    },
+  })
 
   const [selectedFuente, setSelectedFuente] = useState<Fuente | null>(null)
   const [editFuente,     setEditFuente]     = useState<Partial<Fuente> | null>(null)
   const [config,         setConfig]         = useState<Partial<ConfigScraping> | null>(null)
   const [saving,         setSaving]         = useState(false)
+  const [running,        setRunning]        = useState(false)
   const [msg,            setMsg]            = useState('')
 
   const abrirFuente = (f: Fuente) => {
@@ -60,9 +81,83 @@ export default function ScrapingConfigPage() {
     finally { setSaving(false) }
   }
 
+  const eliminarConfiguracion = async () => {
+    if (!selectedFuente) return
+    const existente = configList?.results.find(c => c.fuente === selectedFuente.id)
+    if (!existente) {
+      setMsg('ℹ️ Esta fuente no tiene una configuración avanzada guardada.')
+      return
+    }
+    const ok = window.confirm(`¿Eliminar la configuración avanzada de "${selectedFuente.nombre}"?`)
+    if (!ok) return
+
+    setSaving(true)
+    setMsg('')
+    try {
+      await apiClient.delete(`/config/scraping/${existente.id}/`)
+      qc.invalidateQueries({ queryKey: ['scraping', 'config'] })
+      setConfig({
+        fuente: selectedFuente.id,
+        barrios_objetivo: [],
+        localidades: [],
+        tipos_predio: [],
+        estrato_min: 3,
+        estrato_max: 6,
+        precio_min: null,
+        precio_max: null,
+        area_lote_min: null,
+        frecuencia_cron: '0 6 * * *',
+        max_paginas: 20,
+        delay_entre_paginas: 3,
+        umbral_score_auto_viable: 65,
+        umbral_score_auto_noviable: 30,
+      })
+      setMsg('✅ Configuración eliminada')
+    } catch {
+      setMsg('❌ No se pudo eliminar la configuración')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const eliminarFuente = async () => {
+    if (!selectedFuente) return
+    const ok = window.confirm(
+      `¿Eliminar la fuente "${selectedFuente.nombre}"?\n\nEsto quitará la fuente del panel.`
+    )
+    if (!ok) return
+
+    setSaving(true)
+    setMsg('')
+    try {
+      await apiClient.delete(`/scraping/fuentes/${selectedFuente.id}/`)
+      qc.invalidateQueries({ queryKey: ['scraping'] })
+      setSelectedFuente(null)
+      setEditFuente(null)
+      setConfig(null)
+      setMsg('✅ Fuente eliminada')
+    } catch {
+      setMsg('❌ No se pudo eliminar la fuente')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const ejecutar = async (fuenteId: number) => {
-    await apiClient.post(`/scraping/fuentes/${fuenteId}/ejecutar/`)
-    setMsg('✅ Scraping encolado')
+    setRunning(true)
+    setMsg('')
+    try {
+      const { data } = await apiClient.post(`/scraping/fuentes/${fuenteId}/ejecutar/`)
+      const ejecucionId = data?.ejecucion?.id
+      setMsg(ejecucionId
+        ? `⏳ Scraping encolado. Ejecución #${ejecucionId}`
+        : '⏳ Scraping encolado')
+      qc.invalidateQueries({ queryKey: ['scraping', 'ejecuciones', fuenteId] })
+    } catch {
+      setMsg('❌ No se pudo encolar el scraping')
+    } finally {
+      setRunning(false)
+    }
   }
 
   const nuevaFuente = async () => {
@@ -79,6 +174,14 @@ export default function ScrapingConfigPage() {
 
   const setArr = (k: keyof ConfigScraping, val: string) =>
     setConfig(c => c ? { ...c, [k]: toggleArr(c[k] as string[], val) } : c)
+
+  const ultimaEjecucion = ejecuciones?.[0] ?? null
+  const estadoActivo = ultimaEjecucion?.estado === 'pendiente' || ultimaEjecucion?.estado === 'corriendo'
+  const estadoClass = ultimaEjecucion ? styles[`estado_${ultimaEjecucion.estado}`] : ''
+  const prettyDate = (value: string | null) => {
+    if (!value) return 'Sin fecha'
+    return new Date(value).toLocaleString('es-CO')
+  }
 
   return (
     <div>
@@ -256,9 +359,90 @@ export default function ScrapingConfigPage() {
                 </div>
               </div>
 
+              <div className={styles.panelSection}>
+                <div className={styles.execHeader}>
+                  <h3 className={styles.secTitle}>🛰️ Estado de ejecución</h3>
+                  {fetchingEjecuciones && <span className={styles.execPolling}>Actualizando…</span>}
+                </div>
+
+                {ultimaEjecucion ? (
+                  <div className={styles.execCard}>
+                    <div className={styles.execTop}>
+                      <span className={`${styles.estadoBadge} ${estadoClass}`}>
+                        {ultimaEjecucion.estado === 'pendiente' && 'En cola'}
+                        {ultimaEjecucion.estado === 'corriendo' && 'Corriendo'}
+                        {ultimaEjecucion.estado === 'exitoso' && 'Finalizado'}
+                        {ultimaEjecucion.estado === 'fallido' && 'Fallido'}
+                      </span>
+                      <span className={styles.execId}>Ejecución #{ultimaEjecucion.id}</span>
+                    </div>
+
+                    <div className={styles.execMetrics}>
+                      <div><strong>{ultimaEjecucion.predios_encontrados}</strong><span>encontrados</span></div>
+                      <div><strong>{ultimaEjecucion.predios_nuevos}</strong><span>nuevos</span></div>
+                      <div><strong>{ultimaEjecucion.errores}</strong><span>errores</span></div>
+                    </div>
+
+                    <div className={styles.execMeta}>
+                      <span>Inicio: {prettyDate(ultimaEjecucion.inicio)}</span>
+                      <span>Fin: {prettyDate(ultimaEjecucion.fin)}</span>
+                    </div>
+
+                    <pre className={styles.execLog}>
+                      {ultimaEjecucion.log || 'Sin log todavía.'}
+                    </pre>
+                  </div>
+                ) : (
+                  <div className={styles.execEmpty}>
+                    Aún no hay ejecuciones registradas para esta fuente.
+                  </div>
+                )}
+
+                {!!ejecuciones?.length && (
+                  <div className={styles.execHistory}>
+                    <p className={styles.execHistoryTitle}>Últimas ejecuciones</p>
+                    {ejecuciones.slice(0, 5).map(row => (
+                      <button
+                        key={row.id}
+                        type="button"
+                        className={styles.execHistoryItem}
+                        onClick={() => setMsg(`ℹ️ Viendo ejecución #${row.id}`)}
+                      >
+                        <span className={`${styles.estadoBadge} ${styles[`estado_${row.estado}`]}`}>
+                          {row.estado}
+                        </span>
+                        <span className={styles.execHistoryMeta}>
+                          #{row.id} · {row.predios_encontrados} encontrados · {row.predios_nuevos} nuevos
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className={styles.panelActions}>
-                <button className="btn btn-secondary" onClick={() => ejecutar(selectedFuente.id)}>
-                  ▶️ Ejecutar ahora
+                <button
+                  className={styles.dangerGhost}
+                  type="button"
+                  onClick={eliminarConfiguracion}
+                  disabled={saving || running || estadoActivo}
+                >
+                  Eliminar configuración
+                </button>
+                <button
+                  className={styles.dangerSolid}
+                  type="button"
+                  onClick={eliminarFuente}
+                  disabled={saving || running || estadoActivo}
+                >
+                  Eliminar fuente
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => ejecutar(selectedFuente.id)}
+                  disabled={running || saving || estadoActivo}
+                >
+                  {running ? '⏳ Encolando…' : estadoActivo ? '🛰️ Scraping en curso' : '▶️ Ejecutar ahora'}
                 </button>
                 <div style={{ flex: 1 }} />
                 <button className="btn btn-ghost" onClick={() => setSelectedFuente(null)}>Cancelar</button>
