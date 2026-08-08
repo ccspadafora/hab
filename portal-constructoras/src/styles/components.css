@@ -1,0 +1,131 @@
+/* Content / marketing pages */
+.content-page {
+  background: var(--hab-crema);
+  min-height: 100vh;
+}
+.content-page__hero {
+  background: var(--hab-verde);
+  padding: calc(72px + clamp(40px, 6vw, 80px)) var(--pad-h) clamp(40px, 6vw, 72px);
+}
+.content-page__title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(36px, 5.5vw, 64px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--hab-blanco);
+  max-width: 18ch;
+  margin-top: 8px;
+}
+.content-page__subtitle {
+  margin-top: 18px;
+  max-width: 540px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.72);
+}
+.content-page__body {
+  padding: var(--pad-v) var(--pad-h);
+  max-width: 960px;
+}
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin: 28px 0;
+}
+.content-card {
+  background: var(--hab-blanco);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+.content-card h3 {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--hab-gris);
+  margin-bottom: 10px;
+}
+.content-card p,
+.content-prose p {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: #555;
+}
+.content-prose h2 {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--hab-gris);
+  margin: 40px 0 14px;
+}
+.content-prose h3 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin: 28px 0 10px;
+  color: var(--hab-verde);
+}
+.content-prose ul {
+  padding-left: 18px;
+  margin: 10px 0 18px;
+}
+.content-prose li {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 6px;
+}
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.faq-list details {
+  background: var(--hab-blanco);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+.faq-list summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--hab-gris);
+  list-style: none;
+}
+.faq-list summary::-webkit-details-marker { display: none; }
+.faq-list details[open] summary {
+  color: var(--hab-verde);
+  margin-bottom: 10px;
+}
+.faq-list p {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: #555;
+}
+.testimonio-card quote,
+.testimonio-card blockquote {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--hab-gris);
+  font-style: italic;
+}
+.testimonio-meta {
+  margin-top: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--hab-verde);
+}
