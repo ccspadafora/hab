@@ -1,0 +1,42 @@
+/* HAB Design System — CSS Variables */
+/* Ref: HAB___Design_System.md */
+
+:root {
+  /* Brand colors */
+  --hab-verde:       #2B4D2E;
+  --hab-verde-m:     #3D6B40;
+  --hab-verde-c:     #8FA882;
+  --hab-amarillo:    #C9B84C;
+  --hab-crema:       #F5F2EC;
+  --hab-gris:        #1A1A1A;
+  --hab-blanco:      #FFFFFF;
+  --hab-texto:       #2C2C2C;
+  --hab-logo:        #8A9A7A;
+  --hab-positivo:    #7EC87E;
+  --hab-negativo:    #E07070;
+
+  /* Typography */
+  --font-display:    var(--font-barlow-condensed), 'Barlow Condensed', sans-serif;
+  --font-body:       var(--font-barlow), 'Barlow', sans-serif;
+
+  /* Layout */
+  --pad-v:           clamp(56px, 7vw, 112px);
+  --pad-h:           clamp(20px, 5vw, 80px);
+  --radius-lg:       20px;
+  --radius-md:       16px;
+  --radius-sm:       12px;
+  --radius-pill:     100px;
+  --transition-base: background .3s, border-color .3s, transform .3s, box-shadow .3s;
+
+  /* Marketplace semantic colors */
+  --estado-borrador:         #6B7280;
+  --estado-revision:         #3B82F6;
+  --estado-activa:           #22C55E;
+  --estado-negociacion:      #F59E0B;
+  --estado-exito:            #16A34A;
+  --estado-sin-exito:        #6B7280;
+  --estado-rechazada:        #EF4444;
+  --score-alto:              #22C55E;
+  --score-medio:             #F59E0B;
+  --score-bajo:              #EF4444;
+}

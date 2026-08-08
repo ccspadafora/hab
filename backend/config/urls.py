@@ -22,4 +22,5 @@ urlpatterns = [
         path('ia/',                include('apps.ia.urls')),
         path('tasks/',             include('shared.urls_tasks')),
     ])),
+    path('api/marketplace/v1/', include('api.v1.marketplace.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

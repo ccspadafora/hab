@@ -1,0 +1,218 @@
+@import '../styles/tokens.css';
+@import '../styles/components.css';
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--hab-crema);
+  color: var(--hab-texto);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Display headings */
+h1, h2, h3, .h-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.95;
+}
+
+/* Body text */
+p, li, span {
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.9;
+}
+
+/* Buttons reset */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+}
+
+/* Links */
+a { text-decoration: none; color: inherit; }
+
+/* HAB Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--hab-amarillo);
+  color: var(--hab-gris);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+.btn-primary:hover {
+  background: #b8a43f;
+  transform: translateY(-1px);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--hab-verde);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 13px 27px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--hab-verde);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+.btn-secondary:hover {
+  background: var(--hab-verde);
+  color: var(--hab-blanco);
+}
+
+/* HAB Cards */
+.card {
+  background: var(--hab-blanco);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+/* HAB Section label */
+.section-label {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--hab-amarillo);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 1.5px;
+  background: var(--hab-amarillo);
+  flex-shrink: 0;
+}
+
+/* StatusBadge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.status-badge--sm { font-size: 10px; padding: 4px 10px; }
+.status-badge--md { font-size: 11px; padding: 6px 12px; }
+.status-badge--lg { font-size: 12px; padding: 8px 16px; }
+
+/* Layout helpers */
+.hab-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px var(--pad-h);
+  background: rgba(245, 242, 236, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.hab-header__brand {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: var(--hab-verde);
+  text-transform: uppercase;
+}
+.hab-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.hab-header__nav a {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--hab-texto);
+}
+.hab-header__nav a:hover { color: var(--hab-verde); }
+.hab-footer {
+  background: var(--hab-gris);
+  color: rgba(255,255,255,0.7);
+  padding: 48px var(--pad-h) 32px;
+}
+.hab-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 28px;
+  margin-bottom: 32px;
+}
+.hab-footer__brand {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 32px;
+  color: var(--hab-blanco);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.hab-footer a { color: rgba(255,255,255,0.65); font-size: 13px; }
+.hab-footer a:hover { color: var(--hab-amarillo); }
+.hab-footer__copy {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 20px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+.placeholder-page {
+  min-height: 60vh;
+  padding: var(--pad-v) var(--pad-h);
+}
+.placeholder-page h1 {
+  margin-bottom: 12px;
+  color: var(--hab-gris);
+  font-size: clamp(28px, 4vw, 42px);
+}
+.placeholder-page p {
+  color: #666;
+  max-width: 520px;
+}

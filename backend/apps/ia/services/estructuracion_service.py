@@ -121,3 +121,61 @@ class EstructuracionIAService:
             f'Predio: {json.dumps(predio, ensure_ascii=False)}\n'
             f'Análisis: {json.dumps(analisis, ensure_ascii=False)}'
         )
+
+
+class EstructuracionExpressService:
+    """
+    Thin adapter for marketplace PublicacionInmueble.
+    Does not modify EstructuracionIAService — returns structured fields
+    suitable for EstructuracionExpress.update_or_create(defaults=...).
+    Prefer metrics already computed on the publication; fall back to mock.
+    """
+
+    def __init__(self, publicacion):
+        self.publicacion = publicacion
+
+    def generar(self) -> dict:
+        m = dict(self.publicacion.metricas_prefact or {})
+        area = float(self.publicacion.area_lote or 0)
+        area_vendible = float(m.get('area_edificable_est') or area * 2.0 * 0.85)
+        unidades = int(m.get('unidades_proyectadas') or max(int(area_vendible / 55), 1))
+        ingresos = m.get('ingresos_brutos_est')
+        costo = m.get('costo_total_est')
+        margen = m.get('margen_bruto_est')
+        roi = m.get('roi_est')
+        valor_max = m.get('valor_max_predio_est')
+
+        if ingresos is None:
+            ingresos = round(area_vendible * 6_000_000, 0)
+        if costo is None:
+            costo = round(area * 2.0 * 1_800_000 + float(self.publicacion.precio_esperado or 0), 0)
+        if margen is None and ingresos:
+            margen = round((float(ingresos) - float(costo)) / float(ingresos) * 100, 1)
+        if roi is None and costo:
+            roi = round((float(ingresos) - float(costo)) / float(costo) * 100, 1)
+        if valor_max is None:
+            valor_max = round(float(costo) * 0.35, 0)
+
+        resumen = (
+            f'Estructuración express para {self.publicacion.barrio}: '
+            f'{unidades} unidades, ROI est. {roi}%.'
+        )
+        datos_completos = {
+            'barrio': self.publicacion.barrio,
+            'area_lote': str(self.publicacion.area_lote),
+            'estrato': self.publicacion.estrato,
+            'metricas_origen': m,
+            'fuente': 'express_adapter',
+        }
+        return {
+            'unidades_proyectadas': unidades,
+            'area_vendible_est': area_vendible,
+            'ingresos_brutos_est': ingresos,
+            'costo_total_est': costo,
+            'margen_bruto_est': margen,
+            'roi_est': roi,
+            'valor_max_predio_est': valor_max,
+            'resumen': resumen,
+            'datos_completos': datos_completos,
+            'modelo_ia': 'express-adapter',
+        }

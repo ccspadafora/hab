@@ -40,6 +40,15 @@ LOCAL_APPS = [
     'apps.configuracion',
     'apps.ia',
     'shared',
+    # Marketplace
+    'apps.marketplace.publicaciones',
+    'apps.marketplace.perfiles_constructora',
+    'apps.marketplace.matching',
+    'apps.marketplace.negociaciones',
+    'apps.marketplace.garantias',
+    # Auth pública del marketplace
+    'apps.auth_propietarios',
+    'apps.auth_constructoras',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -135,8 +144,11 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
+    'http://localhost:3001',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
